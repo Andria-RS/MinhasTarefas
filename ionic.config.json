@@ -1,0 +1,7 @@
+{
+  "name": "MinhasTarefas",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}
