@@ -15,13 +15,9 @@
 
   <div id="container">
     
-    <ion-button routerLink="/listas">
-      Ir para Listas
-    </ion-button>
-
-    <ion-button routerLink="/tarefas">
-      Ir para Tarefas
-    </ion-button>
+    <ion-button (click)="irPaginaListas()">Ir para Listas</ion-button>
+    
+    <ion-button (click)="irPaginaTarefas()">Ir para Tarefas</ion-button>
 
   </div>
 </ion-content>

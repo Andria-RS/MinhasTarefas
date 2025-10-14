@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-listas',
@@ -8,7 +9,11 @@ import { Component, OnInit } from '@angular/core';
 })
 export class ListasPage implements OnInit {
 
-  constructor() { }
+  constructor(private router: Router) { }
+  
+  irPaginaTarefas() {
+    this.router.navigateByUrl('/tarefas'); 
+  }
 
   ngOnInit() {
   }
