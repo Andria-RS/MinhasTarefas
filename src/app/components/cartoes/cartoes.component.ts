@@ -1,22 +1,20 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 
-
 @Component({
-  selector: 'app-listas',
-  templateUrl: './listas.page.html',
-  styleUrls: ['./listas.page.scss'],
+  selector: 'app-cartoes',
+  templateUrl: './cartoes.component.html',
+  styleUrls: ['./cartoes.component.scss'],
   standalone: false,
 })
-export class ListasPage implements OnInit {
+export class CartoesComponent  implements OnInit {
 
   constructor(private router: Router) { }
-  
+
   irPaginaTarefas() {
     this.router.navigateByUrl('/tarefas'); 
   }
 
-  ngOnInit() {
-  }
+  ngOnInit() {}
 
 }
