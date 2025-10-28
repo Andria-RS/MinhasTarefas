@@ -15,8 +15,8 @@
   </ion-header>
 
   <div id="container">
-    <app-cartoes titulo="À fazer" />
-    <app-cartoes titulo="Em Processamento" />
-    <app-cartoes titulo="Feito" />
+    <app-cartoes titulo="À fazer" [tasks]="toDo"/>
+    <app-cartoes titulo="Em Processamento" [tasks]="inProgress"/>
+    <app-cartoes titulo="Feito" [tasks]="done"/>
   </div>
 </ion-content>

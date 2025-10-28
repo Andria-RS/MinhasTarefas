@@ -17,5 +17,8 @@ export class CartoesComponent  implements OnInit {
 
   ngOnInit() {}
 
+
   @Input() titulo = '';
+  @Input() tasks: { id: number; titulo: string; descricao: string }[] = [];
+
 }
