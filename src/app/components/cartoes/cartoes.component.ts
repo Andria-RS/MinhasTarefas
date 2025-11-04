@@ -11,8 +11,8 @@ export class CartoesComponent  implements OnInit {
 
   constructor(private router: Router) { }
 
-  irPaginaTarefas() {
-    this.router.navigateByUrl('/tarefas'); 
+  irPaginaTarefas(item: any) {
+    this.router.navigateByUrl(`/tarefas/${item.id}`); 
   }
 
   ngOnInit() {}

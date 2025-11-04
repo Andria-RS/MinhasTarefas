@@ -1,11 +1,11 @@
 <ion-card>
-      <ion-card-header>
+      <ion-card-header color="primary">
         <ion-card-title>{{ titulo }}</ion-card-title>
       </ion-card-header>
 
       <ion-card-content>
         <ion-list>
-          <ion-item *ngFor="let item of tasks" button (click)="irPaginaTarefas()">
+          <ion-item *ngFor="let item of tasks" button (click)="irPaginaTarefas(item)">
             <ion-thumbnail slot="start">
               <img
                 alt="Silhouette of mountains"
