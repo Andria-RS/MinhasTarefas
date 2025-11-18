@@ -1,2 +1,20 @@
 // For information on how to create your own theme, please see:
 // http://ionicframework.com/docs/theming/
+
+:root {
+	--ion-color-roxo: #47008f;
+	--ion-color-roxo-rgb: 71,0,143;
+	--ion-color-roxo-contrast: #ffffff;
+	--ion-color-roxo-contrast-rgb: 255,255,255;
+	--ion-color-roxo-shade: #3e007e;
+	--ion-color-roxo-tint: #591a9a;
+}
+
+.ion-color-roxo {
+	--ion-color-base: var(--ion-color-roxo);
+	--ion-color-base-rgb: var(--ion-color-roxo-rgb);
+	--ion-color-contrast: var(--ion-color-roxo-contrast);
+	--ion-color-contrast-rgb: var(--ion-color-roxo-contrast-rgb);
+	--ion-color-shade: var(--ion-color-roxo-shade);
+	--ion-color-tint: var(--ion-color-roxo-tint);
+}
