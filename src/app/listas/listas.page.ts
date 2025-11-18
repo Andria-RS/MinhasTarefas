@@ -21,6 +21,7 @@ export class ListasPage implements OnInit {
 
   toDo = [
     {id: 1, titulo: "Estudar Angular", descricao:"Aulas"},
+    {id: 4, titulo: "Fazer projeto 1", descricao:"Projetos"},
   ];
 
   inProgress = [

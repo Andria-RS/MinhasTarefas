@@ -1,11 +1,13 @@
 <ion-card>
-      <ion-card-header color="roxo">
-        <ion-card-title>{{ titulo }}</ion-card-title>
-      </ion-card-header>
+  <ion-card-header color="roxo">
+    <ion-card-title>{{ titulo }}</ion-card-title>
+  </ion-card-header>
 
-      <ion-card-content>
-        <ion-list>
-          <ion-item *ngFor="let item of tasks" button (click)="irPaginaTarefas(item)">
+  <ion-card-content>
+      <ion-list>
+        <ion-reorder-group (ionItemReorder)="reordenacao($event)" disabled="false" slot="end">
+          <ion-item *ngFor="let item of tasks">
+            <ion-reorder slot="start"></ion-reorder>
             <ion-thumbnail slot="start">
               <img
                 alt="Silhouette of mountains"
@@ -16,7 +18,14 @@
               <h2>{{ item.titulo }}</h2>
               <p>{{ item.descricao }}</p>
             </ion-label>
+            <ion-button size="" color="roxo" fill="clear" slot="end" (click)="irPaginaTarefas(item)">
+              <ion-icon name="pencil-outline"></ion-icon>
+            </ion-button>
+            <ion-button size="" color="danger" fill="clear" slot="end" (click)="eliminarTarefa(item.id)">
+              <ion-icon name="trash-outline"></ion-icon>
+            </ion-button>
           </ion-item>
-        </ion-list>
-      </ion-card-content>
-    </ion-card>
+        </ion-reorder-group>
+      </ion-list>
+  </ion-card-content>
+</ion-card>
