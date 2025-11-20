@@ -18,7 +18,19 @@ const routes: Routes = [
   {
     path: 'tarefas/:id',
     loadChildren: () => import('./tarefas/tarefas.module').then( m => m.TarefasPageModule)
+  },  {
+    path: 'tabs',
+    loadChildren: () => import('./tabs/tabs.module').then( m => m.TabsPageModule)
   },
+  {
+    path: 'calendar',
+    loadChildren: () => import('./calendar/calendar.module').then( m => m.CalendarPageModule)
+  },
+  {
+    path: 'profile',
+    loadChildren: () => import('./profile/profile.module').then( m => m.ProfilePageModule)
+  },
+
 
 ];
 
