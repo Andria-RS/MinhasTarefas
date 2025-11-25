@@ -1,23 +1,16 @@
 <ion-header [translucent]="true">
-  <ion-toolbar>
+  <ion-toolbar color="roxo">
     <ion-title>
-      As Minhas tarefas
+      <ion-icon name="moon-outline"></ion-icon> As Minhas tarefas
     </ion-title>
+    <ion-buttons slot="end">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">As Minhas tarefas</ion-title>
-    </ion-toolbar>
-  </ion-header>
-
   <div id="container">
-    
     <ion-button color="roxo" (click)="irPaginaListas()">Ir para Listas</ion-button>
-    
-    <!--<ion-button color="roxo" (click)="irPaginaTarefas()">Ir para Tarefas</ion-button>-->
-
   </div>
 </ion-content>
