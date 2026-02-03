@@ -11,10 +11,6 @@ export class HomePage {
 
   constructor(private router: Router) {}
 
-  irPaginaListas() {
-    this.router.navigateByUrl('/listas');
-  }
-
   irPaginaTarefas() {
     this.router.navigateByUrl('/tarefas'); 
   }

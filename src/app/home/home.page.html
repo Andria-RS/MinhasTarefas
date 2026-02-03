@@ -1,16 +1,52 @@
 <ion-header [translucent]="true">
   <ion-toolbar color="roxo">
-    <ion-title>
-      <ion-icon name="moon-outline"></ion-icon> As Minhas tarefas
-    </ion-title>
-    <ion-buttons slot="end">
-      <ion-menu-button></ion-menu-button>
+     <ion-buttons slot="start">
+      <img src="assets/img/logo_TaskBuddy.png" class="logo">
     </ion-buttons>
+    <ion-title>
+      Bem-vindo ao TaskBuddy
+    </ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <div id="container">
-    <ion-button color="roxo" (click)="irPaginaListas()">Ir para Listas</ion-button>
-  </div>
+<ion-content>
+  <!-- Título + botão adicionar -->
+  <ion-item lines="none">
+    <ion-label>
+      <h2>As minhas tarefas</h2>
+    </ion-label>
+    <ion-button fill="clear" color="primary">
+      <ion-icon name="add-circle-outline"></ion-icon>
+    </ion-button>
+  </ion-item>
+
+  <!-- Filtros Hoje / Atrasadas (só visual) -->
+  <ion-segment value="hoje">
+    <ion-segment-button value="hoje">
+      <ion-label>Hoje</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="atrasadas">
+      <ion-label>Atrasadas</ion-label>
+    </ion-segment-button>
+  </ion-segment>
+
+  <!-- Card de tarefa de exemplo -->
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Título da tarefa</ion-card-title>
+      <ion-card-subtitle>Projeto da tarefa</ion-card-subtitle>
+    </ion-card-header>
+
+    <ion-card-content>
+      <p>Descrição breve da tarefa só para exemplo visual.</p>
+
+      <ion-item lines="none">
+        <ion-label>
+          <small>Data limite: 03/02/2026, 18:00</small>
+        </ion-label>
+        <ion-badge color="danger">Atrasada</ion-badge>
+      </ion-item>
+    </ion-card-content>
+  </ion-card>
+
 </ion-content>

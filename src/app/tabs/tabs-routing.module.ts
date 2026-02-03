@@ -17,8 +17,12 @@ const routes: Routes = [
         loadChildren: () => import('../calendar/calendar.module').then(m => m.CalendarPageModule)
       },
       {
-        path: 'profile',
-        loadChildren: () => import('../profile/profile.module').then(m => m.ProfilePageModule)
+        path: 'projetos',
+        loadChildren: () => import('../projetos/projetos.module').then( m => m.ProjetosPageModule)
+      },
+      {
+        path: 'notifications',
+        loadChildren: () => import('../notifications/notifications.module').then( m => m.NotificationsPageModule)
       },
       {
         path: '',
@@ -31,7 +35,7 @@ const routes: Routes = [
     path: '',
     redirectTo: '/tabs/home',
     pathMatch: 'full'
-  }
+  },
 ];
 
 @NgModule({

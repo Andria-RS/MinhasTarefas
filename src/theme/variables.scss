@@ -2,12 +2,12 @@
 // http://ionicframework.com/docs/theming/
 
 :root {
-	--ion-color-roxo: #47008f;
+	--ion-color-roxo: #dcbaff;
 	--ion-color-roxo-rgb: 71,0,143;
 	--ion-color-roxo-contrast: #ffffff;
 	--ion-color-roxo-contrast-rgb: 255,255,255;
-	--ion-color-roxo-shade: #3e007e;
-	--ion-color-roxo-tint: #591a9a;
+	--ion-color-roxo-shade: #dcbaff;
+	--ion-color-roxo-tint: #dcbaff;
 }
 
 .ion-color-roxo {
@@ -18,3 +18,8 @@
 	--ion-color-shade: var(--ion-color-roxo-shade);
 	--ion-color-tint: var(--ion-color-roxo-tint);
 }
+
+ion-title {
+  --color: black;
+}
+
