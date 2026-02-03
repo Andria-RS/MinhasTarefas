@@ -5,5 +5,36 @@
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  
+
+  <div class="cal-wrapper">
+    <!-- Calendário mensal com números -->
+    <ion-datetime
+      presentation="date"
+      [showDefaultButtons]="false"
+      showDefaultTitle="false"
+      showDefaultTimeLabel="false"
+      firstDayOfWeek="1"
+      locale="pt-PT">
+    </ion-datetime>
+  </div>
+
+  <!-- Secção de tarefas do dia selecionado (visual) -->
+  <ion-card class="task-card">
+    <ion-card-header>
+      <ion-card-title>Hoje</ion-card-title>
+      <ion-card-subtitle>1 tarefa(s)</ion-card-subtitle>
+    </ion-card-header>
+
+    <ion-card-content>
+      <ion-item lines="none">
+        <ion-label>
+          <h2>Nome da tarefa</h2>
+          <p>12:00</p>
+        </ion-label>
+        <ion-badge color="success">Feito</ion-badge>
+      </ion-item>
+    </ion-card-content>
+  </ion-card>
+
 </ion-content>
+

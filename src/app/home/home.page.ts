@@ -8,6 +8,9 @@ import { Router } from '@angular/router';
   standalone: false,
 })
 export class HomePage {
+  filtro: 'hoje' | 'atrasadas' = 'hoje';
+
+  isModalAberto = false;
 
   constructor(private router: Router) {}
 

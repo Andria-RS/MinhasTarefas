@@ -1,27 +1,25 @@
 <ion-header [translucent]="true">
   <ion-toolbar color="roxo">
-     <ion-buttons slot="start">
+    <ion-buttons slot="start">
       <img src="assets/img/logo_TaskBuddy.png" class="logo">
     </ion-buttons>
-    <ion-title>
-      Bem-vindo ao TaskBuddy
-    </ion-title>
+    <ion-title>Bem-vindo ao TaskBuddy</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
-  <!-- Título + botão adicionar -->
+
   <ion-item lines="none">
     <ion-label>
-      <h2>As minhas tarefas</h2>
+      <h1>As minhas tarefas</h1>
     </ion-label>
-    <ion-button fill="clear" color="primary">
-      <ion-icon name="add-circle-outline"></ion-icon>
+    <ion-button fill="clear" color="roxo" (click)="isModalAberto = true">
+      <ion-icon size="large" name="add-circle-outline"></ion-icon>
     </ion-button>
   </ion-item>
 
-  <!-- Filtros Hoje / Atrasadas (só visual) -->
-  <ion-segment value="hoje">
+  <!-- ligar o segment à variável filtro -->
+  <ion-segment [(ngModel)]="filtro">
     <ion-segment-button value="hoje">
       <ion-label>Hoje</ion-label>
     </ion-segment-button>
@@ -30,23 +28,127 @@
     </ion-segment-button>
   </ion-segment>
 
-  <!-- Card de tarefa de exemplo -->
-  <ion-card>
+  <!-- Tarefa 1 (Hoje) -->
+  <ion-card *ngIf="filtro === 'hoje'">
     <ion-card-header>
-      <ion-card-title>Título da tarefa</ion-card-title>
-      <ion-card-subtitle>Projeto da tarefa</ion-card-subtitle>
+      <ion-card-title>Estudar PMEU</ion-card-title>
+      <ion-card-subtitle>Projeto Faculdade</ion-card-subtitle>
     </ion-card-header>
-
     <ion-card-content>
-      <p>Descrição breve da tarefa só para exemplo visual.</p>
-
+      <p>Rever slides da aula e terminar exercícios.</p>
       <ion-item lines="none">
         <ion-label>
-          <small>Data limite: 03/02/2026, 18:00</small>
+          <small>Data limite: Hoje, 23:59</small>
+        </ion-label>
+        <ion-badge color="azul">Por Fazer</ion-badge>
+      </ion-item>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Tarefa 2 (Atrasada) -->
+  <ion-card *ngIf="filtro === 'atrasadas'">
+    <ion-card-header>
+      <ion-card-title>Comprar mantimentos</ion-card-title>
+      <ion-card-subtitle> Projeto Pessoal</ion-card-subtitle>
+    </ion-card-header>
+    <ion-card-content>
+      <p>Leite, pão, frutas, legumes.</p>
+      <ion-item lines="none">
+        <ion-label>
+          <small>Data limite: 01/02/2026, 18:00</small>
         </ion-label>
         <ion-badge color="danger">Atrasada</ion-badge>
       </ion-item>
     </ion-card-content>
   </ion-card>
-
 </ion-content>
+
+
+<!-- Slide / sheet de Nova Tarefa -->
+<ion-modal
+  [isOpen]="isModalAberto"
+  (didDismiss)="isModalAberto = false"
+  keepContentsMounted="true"
+  class="sheet-modal">
+
+  <ng-template>
+    <ion-header>
+      <ion-toolbar>
+        <ion-title>Nova tarefa</ion-title>
+        <ion-buttons slot="end">
+          <ion-button (click)="isModalAberto = false">
+            <ion-icon name="close"></ion-icon>
+          </ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+
+    <ion-content>
+      <!-- Imagem da tarefa (visual) -->
+      <ion-item>
+        <ion-label position="stacked">Imagem da tarefa</ion-label>
+        <ion-button fill="outline" expand="block" color="medium">
+          <ion-icon name="image-outline" slot="start"></ion-icon>
+          <ion-label>Escolher imagem</ion-label>
+        </ion-button>
+      </ion-item>
+      <!-- Pré-visualização de exemplo fixa -->
+      <ion-item lines="none">
+        <img src="assets/img/exemplo_tarefa.png"
+            style="width: 100%; border-radius: 8px;">
+      </ion-item>
+
+      <!-- Título -->
+      <ion-item>
+        <ion-label position="stacked">Título</ion-label>
+        <ion-input placeholder="Ex: Estudar PMEU"></ion-input>
+      </ion-item>
+
+      <!-- Projeto (com seta para parecer select) -->
+      <ion-item>
+        <ion-label position="stacked">Projeto</ion-label>
+        <ion-select placeholder="Selecionar projeto">
+          <ion-select-option value="faculdade">Faculdade</ion-select-option>
+          <ion-select-option value="pessoal">Pessoal</ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <!-- Data e Hora lado a lado -->
+      <ion-item>
+        <ion-label position="stacked">Data</ion-label>
+        <ion-datetime-button datetime="dt-tarefa"></ion-datetime-button>
+      </ion-item>
+
+      <ion-modal [keepContentsMounted]="true">
+        <ng-template>
+          <ion-datetime id="dt-tarefa" presentation="date-time"></ion-datetime>
+        </ng-template>
+      </ion-modal>
+
+      <!-- Descrição -->
+      <ion-item>
+        <ion-label position="stacked">Descrição</ion-label>
+        <ion-textarea
+          auto-grow="true"
+          placeholder="Escreve aqui os detalhes da tarefa..."
+        ></ion-textarea>
+      </ion-item>
+
+      <!-- Categoria -->
+      <ion-item>
+        <ion-label position="stacked">Categoria</ion-label>
+        <ion-select placeholder="Selecionar categoria">
+          <ion-select-option value="faculdade">Faculdade</ion-select-option>
+          <ion-select-option value="trabalho">Trabalho</ion-select-option>
+          <ion-select-option value="pessoal">Pessoal</ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <!-- Botão Criar -->
+      <ion-button expand="block" color="roxo" class="btn-criar">
+        Criar
+      </ion-button>
+
+    </ion-content>
+  </ng-template>
+</ion-modal>

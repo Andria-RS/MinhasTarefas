@@ -1,0 +1,55 @@
+ion-content {
+  --padding-start: 12px;
+  --padding-end: 12px;
+}
+
+/* Wrapper para o calendário ficar centrado e com largura máxima */
+.cal-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-top: 8px;
+}
+
+/* Ion-datetime responsivo */
+.cal-wrapper ion-datetime {
+  width: 100%;
+  max-width: 420px;   /* bom em telemóvel e tablet */
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+/* Card das tarefas adaptado à largura do ecrã */
+.task-card {
+  margin: 16px auto;
+  width: 100%;
+  max-width: 420px;
+}
+
+/* Tipografia adapta-se melhor em ecrãs pequenos */
+.task-card h2 {
+  font-size: 16px;
+}
+
+.task-card p {
+  font-size: 14px;
+}
+
+ion-datetime {
+  /* diz ao datetime para usar a cor roxo do tema */
+  --ion-color-primary: var(--ion-color-roxo);
+}
+
+/* dia selecionado / hoje em roxo em vez de azul */
+ion-datetime::part(calendar-day today),
+ion-datetime::part(calendar-day active) {
+  background: var(--ion-color-roxo);
+  color: var(--ion-color-roxo-contrast);
+  border-radius: 999px;
+}
+
+/* setas de navegação (esquerda/direita) em roxo */
+ion-datetime::part(next-month),
+ion-datetime::part(prev-month) {
+  color: var(--ion-color-roxo);
+}
+

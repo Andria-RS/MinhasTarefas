@@ -32,3 +32,12 @@
   margin: 0 auto;
 }
 
+.sheet-modal {
+  --height: 70%;
+  --border-radius: 16px 16px 0 0;
+  align-items: flex-end; // faz aparecer de baixo
+}
+
+.btn-criar {
+  margin-top: 16px;
+}
