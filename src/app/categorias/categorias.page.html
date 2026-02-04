@@ -1,0 +1,60 @@
+<ion-header [translucent]="true">
+  <ion-toolbar color="roxo">
+    <ion-title>Categorias de Projetos</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <!-- Barra de pesquisa + botão filtros -->
+  <ion-item lines="none">
+    <ion-searchbar placeholder="Filtrar categorias"></ion-searchbar>
+    <ion-button fill="clear" slot="end">
+      <ion-icon name="options-outline"></ion-icon>
+    </ion-button>
+  </ion-item>
+
+  <!-- Lista de categorias (só exemplo visual) -->
+  <ion-list lines="none">
+
+    <!-- Categoria 1 -->
+    <ion-item>
+      <ion-avatar slot="start">
+        <ion-icon name="school-outline"></ion-icon>
+      </ion-avatar>
+
+      <ion-label>
+        <h2>Escola</h2>
+        <p>3 projetos</p>
+      </ion-label>
+
+      <!-- botão ... para Editar / Eliminar -->
+      <ion-button fill="clear" slot="end" (click)="abrirOpcoesCategoria()">
+        <ion-icon name="ellipsis-vertical"></ion-icon>
+      </ion-button>
+    </ion-item>
+
+    <!-- Categoria 2 -->
+    <ion-item>
+      <ion-avatar slot="start">
+        <ion-icon name="briefcase-outline"></ion-icon>
+      </ion-avatar>
+
+      <ion-label>
+        <h2>Trabalho</h2>
+        <p>2 projetos</p>
+      </ion-label>
+
+      <ion-button fill="clear" slot="end">
+        <ion-icon name="ellipsis-vertical"></ion-icon>
+      </ion-button>
+    </ion-item>
+
+  </ion-list>
+
+  <!-- Botão + no fundo para nova categoria -->
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-fab-button color="roxo">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+</ion-content>

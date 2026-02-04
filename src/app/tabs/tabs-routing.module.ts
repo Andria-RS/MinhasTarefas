@@ -17,8 +17,8 @@ const routes: Routes = [
         loadChildren: () => import('../calendar/calendar.module').then(m => m.CalendarPageModule)
       },
       {
-        path: 'projetos',
-        loadChildren: () => import('../projetos/projetos.module').then( m => m.ProjetosPageModule)
+        path: 'categorias',
+        loadChildren: () => import('../categorias/categorias.module').then( m => m.CategoriasPageModule)
       },
       {
         path: 'notifications',
@@ -36,6 +36,11 @@ const routes: Routes = [
     redirectTo: '/tabs/home',
     pathMatch: 'full'
   },
+  {
+    path: 'categorias',
+    loadChildren: () => import('../categorias/categorias.module').then( m => m.CategoriasPageModule)
+  },
+
 ];
 
 @NgModule({

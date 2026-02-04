@@ -9,7 +9,7 @@ import { Router } from '@angular/router';
 })
 export class ProjetosPage implements OnInit {
 
-  constructor(private router: Router) {}
+  constructor(private router: Router,) {}
 
   irPaginaListas() {
     this.router.navigateByUrl('/listas');
