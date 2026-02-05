@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { ActionSheetController } from '@ionic/angular';
 
 type EstadoProjeto = 'por-fazer' | 'feito';
 
@@ -40,7 +41,8 @@ export class ProjetosPage implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private actionSheetCtrl: ActionSheetController
   ) {}
 
   ngOnInit() {
@@ -62,10 +64,38 @@ export class ProjetosPage implements OnInit {
   }
 
   abrirDetalhe(projeto: Projeto) {
-    this.router.navigate(['/projeto', projeto.id]);
+    this.router.navigate(['/detalhe-projeto', projeto.id]);
   }
 
-  abrirOpcoesProjeto(projeto: Projeto) {
-    console.log('Opções para projeto', projeto);
+  async abrirOpcoesProjeto(projeto: Projeto) {
+    const sheet = await this.actionSheetCtrl.create({
+      header: projeto.nome,
+      buttons: [
+        {
+          text: 'Editar',
+          icon: 'create-outline',
+          handler: () => {
+            console.log('Editar projeto', projeto);
+            // TODO: abrir modal / página de edição
+          }
+        },
+        {
+          text: 'Eliminar',
+          role: 'destructive',
+          icon: 'trash-outline',
+          handler: () => {
+            console.log('Eliminar projeto', projeto);
+            // TODO: remover do array/backend
+          }
+        },
+        {
+          text: 'Cancelar',
+          role: 'cancel',
+          icon: 'close-outline'
+        }
+      ]
+    });
+
+    await sheet.present();
   }
 }

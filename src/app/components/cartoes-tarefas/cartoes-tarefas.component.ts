@@ -6,8 +6,8 @@ export interface Tarefa {
   projeto: string;
   descricao: string;
   dataLimite: string;
-  estado: 'por-fazer' | 'atrasada';
-  tipo: 'hoje' | 'atrasadas';
+  estado: 'por-fazer' | 'feito' | 'atrasada';
+  tipo?: 'hoje' | 'atrasadas'; 
 }
 
 @Component({

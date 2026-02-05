@@ -15,6 +15,10 @@
         Por Fazer
       </ion-badge>
 
+      <ion-badge *ngIf="tarefa.estado === 'feito'" color="success">
+        Feito
+      </ion-badge>
+
       <ion-badge *ngIf="tarefa.estado === 'atrasada'" color="danger">
         Atrasada
       </ion-badge>

@@ -1,0 +1,76 @@
+<ion-header [translucent]="true">
+  <ion-toolbar color="roxo">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/categorias"></ion-back-button>
+    </ion-buttons>
+
+    <ion-title>{{ projeto.nome }}</ion-title>
+
+    <ion-buttons slot="end">
+      <ion-button fill="clear">
+        <ion-icon name="ellipsis-vertical"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+
+  <!-- card com info do projeto -->
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>{{ projeto.nome }}</ion-card-title>
+      <ion-card-subtitle>
+        <ion-badge color="azul" *ngIf="projeto.estado === 'por-fazer'">
+          Por fazer
+        </ion-badge>
+        <ion-badge color="success" *ngIf="projeto.estado === 'feito'">
+          Feito
+        </ion-badge>
+        <ion-badge color="danger" *ngIf="projeto.estado === 'atrasada'">
+          Atrasada
+        </ion-badge>
+      </ion-card-subtitle>
+    </ion-card-header>
+    <ion-card-content>
+      {{ projeto.descricao }}
+    </ion-card-content>
+  </ion-card>
+
+
+  <!-- Título + botão que abre o MESMO modal da home -->
+  <ion-item lines="none">
+    <ion-label>
+      <h2>Tarefas do projeto</h2>
+    </ion-label>
+
+    <ion-button fill="clear" color="roxo" (click)="isModalAberto = true">
+      <ion-icon size="large" name="add-circle-outline"></ion-icon>
+    </ion-button>
+
+    <ion-modal
+      [isOpen]="isModalAberto"
+      (didDismiss)="isModalAberto = false"
+      class="sheet-modal"
+      [breakpoints]="[0, 1]"
+      [initialBreakpoint]="1"
+    >
+      <ng-template>
+        <!-- modal igual ao da home, mas já com categoria e projeto -->
+        <app-nova-tarefa
+          [categoria]="projeto.categoria"
+          [projeto]="projeto.nome">
+        </app-nova-tarefa>
+      </ng-template>
+    </ion-modal>
+  </ion-item>
+
+  <!-- LISTA DE TAREFAS USANDO OS CARTÕES -->
+  <ion-list lines="none">
+    <app-cartoes-tarefas
+      *ngFor="let tarefa of tarefas"
+      [tarefa]="tarefa">
+    </app-cartoes-tarefas>
+  </ion-list>
+
+</ion-content>

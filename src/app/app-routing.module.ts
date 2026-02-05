@@ -32,6 +32,16 @@ const routes: Routes = [
     loadChildren: () =>
       import('./projetos/projetos.module').then(m => m.ProjetosPageModule)
   },
+  {
+    path: 'detalhes-projeto',
+    loadChildren: () => 
+      import('./detalhes-projeto/detalhes-projeto.module').then( m => m.DetalhesProjetoPageModule)
+  },
+  {
+  path: 'detalhe-projeto/:projetoId',
+  loadChildren: () => 
+    import('./detalhes-projeto/detalhes-projeto.module').then(m => m.DetalhesProjetoPageModule)
+  },
 ];
 
 

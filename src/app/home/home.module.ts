@@ -5,21 +5,18 @@ import { FormsModule } from '@angular/forms';
 import { HomePage } from './home.page';
 
 import { HomePageRoutingModule } from './home-routing.module';
-
-import { NovaTarefaComponent } from '../components/nova-tarefa/nova-tarefa.component';
-import { CartoesTarefasComponent } from '../components/cartoes-tarefas/cartoes-tarefas.component';
+import { ComponentsModule } from '../components/components.module';
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
-    HomePageRoutingModule
+    HomePageRoutingModule,
+    ComponentsModule          // <- adicionas isto
   ],
   declarations: [
-    HomePage,
-    NovaTarefaComponent,
-    CartoesTarefasComponent 
+    HomePage                  // <- só a HomePage
   ]
 })
 export class HomePageModule {}

@@ -35,7 +35,11 @@
       </ion-label>
 
       <!-- zona direita: badge + 3 pontinhos -->
-      <div slot="end" class="end-wrapper">
+      <div
+        slot="end"
+        class="end-wrapper"
+        (click)="$event.stopPropagation()"
+      >
         <ion-badge *ngIf="proj.estado === 'por-fazer'" color="azul">
           Por fazer
         </ion-badge>
@@ -45,12 +49,11 @@
 
         <ion-button
           fill="clear"
-          (click)="abrirOpcoesProjeto(proj); $event.stopPropagation()"
+          (click)="abrirOpcoesProjeto(proj)"
         >
           <ion-icon name="ellipsis-vertical"></ion-icon>
         </ion-button>
       </div>
     </ion-item>
-
   </ion-list>
 </ion-content>
