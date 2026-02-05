@@ -1,0 +1,31 @@
+.projeto-item {
+  margin: 6px 0;
+  border-radius: 16px;
+  --background: rgba(255, 255, 255, 0.03);
+}
+
+ion-thumbnail {
+  --border-radius: 12px;
+  img {
+    object-fit: cover;
+  }
+}
+
+ion-label h2 {
+  font-weight: 600;
+}
+
+ion-label p {
+  font-size: 13px;
+  opacity: 0.7;
+  margin-bottom: 4px;
+}
+
+.end-wrapper {
+  display: flex;
+}
+
+.end-wrapper ion-badge {
+  margin-top: 15px;       /* quanto maior, mais para baixo */
+}
+

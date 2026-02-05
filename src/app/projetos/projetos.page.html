@@ -1,7 +1,9 @@
 <ion-header [translucent]="true">
   <ion-toolbar color="roxo">
-    <ion-title>Projeto X</ion-title>
-
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/categorias"></ion-back-button>
+    </ion-buttons>
+    <ion-title>{{ titulo }}</ion-title>
     <ion-buttons slot="end">
       <ion-menu-button></ion-menu-button>
     </ion-buttons>
@@ -9,5 +11,46 @@
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  
+  <ion-item lines="none">
+    <ion-searchbar placeholder="Filtrar categorias"></ion-searchbar>
+    <ion-button fill="clear" slot="end">
+      <ion-icon name="options-outline"></ion-icon>
+    </ion-button>
+  </ion-item>
+
+  <ion-list>
+    <ion-item
+      *ngFor="let proj of projetos"
+      class="projeto-item"
+      button
+      (click)="abrirDetalhe(proj)"
+    >
+      <ion-thumbnail slot="start">
+        <img [src]="proj.imagem" alt="">
+      </ion-thumbnail>
+
+      <ion-label>
+        <h2>{{ proj.nome }}</h2>
+        <p>{{ proj.totalTarefas }} tarefas</p>
+      </ion-label>
+
+      <!-- zona direita: badge + 3 pontinhos -->
+      <div slot="end" class="end-wrapper">
+        <ion-badge *ngIf="proj.estado === 'por-fazer'" color="azul">
+          Por fazer
+        </ion-badge>
+        <ion-badge *ngIf="proj.estado === 'feito'" color="success">
+          Feito
+        </ion-badge>
+
+        <ion-button
+          fill="clear"
+          (click)="abrirOpcoesProjeto(proj); $event.stopPropagation()"
+        >
+          <ion-icon name="ellipsis-vertical"></ion-icon>
+        </ion-button>
+      </div>
+    </ion-item>
+
+  </ion-list>
 </ion-content>

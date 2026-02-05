@@ -26,7 +26,12 @@ const routes: Routes = [
     path: 'projetos',
     loadChildren: () =>
       import('./projetos/projetos.module').then(m => m.ProjetosPageModule)
-  }
+  },
+  {
+    path: 'projetos/:categoriaId',
+    loadChildren: () =>
+      import('./projetos/projetos.module').then(m => m.ProjetosPageModule)
+  },
 ];
 
 
