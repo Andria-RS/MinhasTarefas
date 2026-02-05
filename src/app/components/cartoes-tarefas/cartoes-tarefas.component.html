@@ -1,0 +1,23 @@
+<ion-card>
+  <ion-card-header>
+    <ion-card-title>{{ tarefa.titulo }}</ion-card-title>
+    <ion-card-subtitle>{{ tarefa.projeto }}</ion-card-subtitle>
+  </ion-card-header>
+
+  <ion-card-content>
+    <p>{{ tarefa.descricao }}</p>
+    <ion-item lines="none">
+      <ion-label>
+        <small>Data limite: {{ tarefa.dataLimite }}</small>
+      </ion-label>
+
+      <ion-badge *ngIf="tarefa.estado === 'por-fazer'" color="azul">
+        Por Fazer
+      </ion-badge>
+
+      <ion-badge *ngIf="tarefa.estado === 'atrasada'" color="danger">
+        Atrasada
+      </ion-badge>
+    </ion-item>
+  </ion-card-content>
+</ion-card>

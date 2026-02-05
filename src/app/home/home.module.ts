@@ -6,6 +6,8 @@ import { HomePage } from './home.page';
 
 import { HomePageRoutingModule } from './home-routing.module';
 
+import { NovaTarefaComponent } from '../components/nova-tarefa/nova-tarefa.component';
+import { CartoesTarefasComponent } from '../components/cartoes-tarefas/cartoes-tarefas.component';
 
 @NgModule({
   imports: [
@@ -14,6 +16,10 @@ import { HomePageRoutingModule } from './home-routing.module';
     IonicModule,
     HomePageRoutingModule
   ],
-  declarations: [HomePage]
+  declarations: [
+    HomePage,
+    NovaTarefaComponent,
+    CartoesTarefasComponent 
+  ]
 })
 export class HomePageModule {}

@@ -1,0 +1,78 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Nova tarefa</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="fechar()">
+        <ion-icon name="close"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content fullscreen="true" >
+  <!-- Imagem da tarefa (visual) -->
+  <ion-item>
+    <ion-label position="stacked">Imagem da tarefa</ion-label>
+    <ion-button fill="outline" expand="block" color="medium">
+      <ion-icon name="image-outline" slot="start"></ion-icon>
+      <ion-label>Escolher imagem</ion-label>
+    </ion-button>
+  </ion-item>
+
+  <ion-item lines="none">
+    <img src="assets/img/exemplo_tarefa.png"
+         style="width: 100%; border-radius: 8px;">
+  </ion-item>
+
+  <!-- Título -->
+  <ion-item>
+    <ion-label position="stacked">Título</ion-label>
+    <ion-input placeholder="Ex: Estudar PMEU"></ion-input>
+  </ion-item>
+
+  <!-- Projeto -->
+  <ion-item>
+    <ion-label position="stacked">Projeto</ion-label>
+    <ion-select placeholder="Selecionar projeto">
+      <ion-select-option value="faculdade">Faculdade</ion-select-option>
+      <ion-select-option value="pessoal">Pessoal</ion-select-option>
+    </ion-select>
+  </ion-item>
+
+  <!-- Data e Hora -->
+  <ion-item>
+    <ion-label position="stacked">Data</ion-label>
+    <ion-datetime-button datetime="dt-tarefa"></ion-datetime-button>
+  </ion-item>
+
+  <ion-modal [keepContentsMounted]="true">
+    <ng-template>
+      <ion-datetime id="dt-tarefa" presentation="date-time"></ion-datetime>
+    </ng-template>
+  </ion-modal>
+
+  <!-- Descrição -->
+  <ion-item>
+    <ion-label position="stacked">Descrição</ion-label>
+    <ion-textarea
+      auto-grow="true"
+      placeholder="Escreve aqui os detalhes da tarefa...">
+    </ion-textarea>
+  </ion-item>
+
+  <!-- Categoria -->
+  <ion-item>
+    <ion-label position="stacked">Categoria</ion-label>
+    <ion-select placeholder="Selecionar categoria">
+      <ion-select-option value="faculdade">Faculdade</ion-select-option>
+      <ion-select-option value="trabalho">Trabalho</ion-select-option>
+      <ion-select-option value="pessoal">Pessoal</ion-select-option>
+    </ion-select>
+  </ion-item>
+
+  <!-- Botão Criar -->
+  <ion-button expand="block" color="roxo" class="btn-criar">
+    Criar
+  </ion-button>
+
+</ion-content>

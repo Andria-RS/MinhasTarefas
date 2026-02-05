@@ -1,5 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { ActionSheetController } from '@ionic/angular';
+import { Router } from '@angular/router';
+
+interface Categoria {
+  id: string;
+  nome: string;
+  icon: string;
+  totalProjetos: number;
+}
 
 @Component({
   selector: 'app-categorias',
@@ -9,19 +17,31 @@ import { ActionSheetController } from '@ionic/angular';
 })
 export class CategoriasPage implements OnInit {
 
-  constructor(private actionSheetCtrl: ActionSheetController) { }
+  categorias: Categoria[] = [
+    { id: 'escola',   nome: 'Escola',   icon: 'school-outline',    totalProjetos: 3 },
+    { id: 'trabalho', nome: 'Trabalho', icon: 'briefcase-outline', totalProjetos: 2 },
+  ];
 
-  ngOnInit() { }
+  constructor(
+    private actionSheetCtrl: ActionSheetController,
+    private router: Router
+  ) {}
 
-  async abrirOpcoesCategoria() {
+  ngOnInit() {}
+
+  abrirProjetos(cat: Categoria) {
+    this.router.navigate(['/projetos', cat.id]);
+  }
+
+  async abrirOpcoesCategoria(cat: Categoria) {
     const sheet = await this.actionSheetCtrl.create({
-      header: 'Categoria',
+      header: cat.nome,
       buttons: [
         {
           text: 'Editar',
           icon: 'create-outline',
           handler: () => {
-            // mais tarde: lógica de editar
+            console.log('Editar', cat);
           }
         },
         {
@@ -29,7 +49,7 @@ export class CategoriasPage implements OnInit {
           role: 'destructive',
           icon: 'trash-outline',
           handler: () => {
-            // mais tarde: lógica de eliminar
+            console.log('Eliminar', cat);
           }
         },
         {

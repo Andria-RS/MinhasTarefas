@@ -8,34 +8,27 @@ const routes: Routes = [
     pathMatch: 'full'
   },
   {
-    path: 'home',
-    loadChildren: () => import('./home/home.module').then( m => m.HomePageModule)
+    path: 'tabs',
+    loadChildren: () =>
+      import('./tabs/tabs.module').then(m => m.TabsPageModule)
   },
   {
     path: 'listas',
-    loadChildren: () => import('./listas/listas.module').then( m => m.ListasPageModule)
+    loadChildren: () =>
+      import('./listas/listas.module').then(m => m.ListasPageModule)
   },
   {
     path: 'tarefas/:id',
-    loadChildren: () => import('./tarefas/tarefas.module').then( m => m.TarefasPageModule)
-  },
-  {
-    path: 'tabs',
-    loadChildren: () => import('./tabs/tabs.module').then( m => m.TabsPageModule)
-  },
-  {
-    path: 'calendar',
-    loadChildren: () => import('./calendar/calendar.module').then( m => m.CalendarPageModule)
+    loadChildren: () =>
+      import('./tarefas/tarefas.module').then(m => m.TarefasPageModule)
   },
   {
     path: 'projetos',
-    loadChildren: () => import('./projetos/projetos.module').then( m => m.ProjetosPageModule)
-  },
-  {
-    path: 'notifications',
-    loadChildren: () => import('./notifications/notifications.module').then( m => m.NotificationsPageModule)
+    loadChildren: () =>
+      import('./projetos/projetos.module').then(m => m.ProjetosPageModule)
   }
 ];
+
 
 @NgModule({
   imports: [

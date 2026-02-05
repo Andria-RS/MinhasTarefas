@@ -1,6 +1,13 @@
 // For information on how to create your own theme, please see:
 // http://ionicframework.com/docs/theming/
 
+.sheet-modal {
+  --border-radius: 16px 16px 0 0;
+  --height: 85%;
+  align-items: flex-end;
+}
+
+
 :root {
 	--ion-color-roxo: #dcbaff;
 	--ion-color-roxo-rgb: 71,0,143;

@@ -5,6 +5,7 @@
 </ion-header>
 
 <ion-content [fullscreen]="true">
+
   <!-- Barra de pesquisa + botão filtros -->
   <ion-item lines="none">
     <ion-searchbar placeholder="Filtrar categorias"></ion-searchbar>
@@ -13,38 +14,29 @@
     </ion-button>
   </ion-item>
 
-  <!-- Lista de categorias (só exemplo visual) -->
+  <!-- Lista de categorias dentro de cards -->
   <ion-list lines="none">
 
-    <!-- Categoria 1 -->
-    <ion-item>
+    <ion-item
+      *ngFor="let cat of categorias"
+      class="categoria-item"
+      button
+      (click)="abrirProjetos(cat)"
+    >
       <ion-avatar slot="start">
-        <ion-icon name="school-outline"></ion-icon>
+        <ion-icon [name]="cat.icon"></ion-icon>
       </ion-avatar>
 
       <ion-label>
-        <h2>Escola</h2>
-        <p>3 projetos</p>
+        <h2>{{ cat.nome }}</h2>
+        <p>{{ cat.totalProjetos }} projetos</p>
       </ion-label>
 
-      <!-- botão ... para Editar / Eliminar -->
-      <ion-button fill="clear" slot="end" (click)="abrirOpcoesCategoria()">
-        <ion-icon name="ellipsis-vertical"></ion-icon>
-      </ion-button>
-    </ion-item>
-
-    <!-- Categoria 2 -->
-    <ion-item>
-      <ion-avatar slot="start">
-        <ion-icon name="briefcase-outline"></ion-icon>
-      </ion-avatar>
-
-      <ion-label>
-        <h2>Trabalho</h2>
-        <p>2 projetos</p>
-      </ion-label>
-
-      <ion-button fill="clear" slot="end">
+      <ion-button
+        fill="clear"
+        slot="end"
+        (click)="abrirOpcoesCategoria(cat); $event.stopPropagation()"
+      >
         <ion-icon name="ellipsis-vertical"></ion-icon>
       </ion-button>
     </ion-item>
@@ -57,4 +49,5 @@
       <ion-icon name="add"></ion-icon>
     </ion-fab-button>
   </ion-fab>
+
 </ion-content>
