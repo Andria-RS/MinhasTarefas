@@ -17,9 +17,9 @@ export class HomePage {
   tarefas: Tarefa[] = [
   {
     id: 1,
-    titulo: 'Estudar PMEU',
-    projeto: 'Projeto Faculdade',
-    descricao: 'Rever slides da aula e terminar exercícios.',
+    titulo: 'Ler apontamentos',
+    projeto: 'Estudar PMEU',
+    descricao: 'Capítulo 1 a 3',
     dataLimite: 'Hoje, 23:59',
     estado: 'por-fazer',
     tipo: 'hoje',

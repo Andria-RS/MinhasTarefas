@@ -9,7 +9,11 @@
   <!-- Barra de pesquisa + botão filtros -->
   <ion-item lines="none">
     <ion-searchbar placeholder="Filtrar categorias"></ion-searchbar>
-    <ion-button fill="clear" slot="end">
+    <ion-button
+      fill="clear"
+      slot="end"
+      (click)="abrirFiltrosCategorias()"
+    >
       <ion-icon name="options-outline"></ion-icon>
     </ion-button>
   </ion-item>

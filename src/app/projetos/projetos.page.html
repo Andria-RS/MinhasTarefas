@@ -12,8 +12,12 @@
 
 <ion-content [fullscreen]="true">
   <ion-item lines="none">
-    <ion-searchbar placeholder="Filtrar categorias"></ion-searchbar>
-    <ion-button fill="clear" slot="end">
+    <ion-searchbar placeholder="Filtrar projetos"></ion-searchbar>
+    <ion-button
+      fill="clear"
+      slot="end"
+      (click)="abrirFiltrosProjetos()"
+    >
       <ion-icon name="options-outline"></ion-icon>
     </ion-button>
   </ion-item>
@@ -56,4 +60,11 @@
       </div>
     </ion-item>
   </ion-list>
+
+  <!-- Botão + no fundo para nova categoria -->
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-fab-button color="roxo">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
 </ion-content>

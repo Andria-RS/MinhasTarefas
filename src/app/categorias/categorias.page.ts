@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { ActionSheetController } from '@ionic/angular';
 import { Router } from '@angular/router';
+import { OpcoesService } from '../services/opcoes';
 
 interface Categoria {
   id: string;
@@ -23,8 +23,8 @@ export class CategoriasPage implements OnInit {
   ];
 
   constructor(
-    private actionSheetCtrl: ActionSheetController,
-    private router: Router
+    private router: Router,
+    private opcoesService: OpcoesService
   ) {}
 
   ngOnInit() {}
@@ -33,34 +33,32 @@ export class CategoriasPage implements OnInit {
     this.router.navigate(['/projetos', cat.id]);
   }
 
-  async abrirOpcoesCategoria(cat: Categoria) {
-    const sheet = await this.actionSheetCtrl.create({
-      header: cat.nome,
-      buttons: [
-        {
-          text: 'Editar',
-          icon: 'create-outline',
-          handler: () => {
-            console.log('Editar', cat);
-          }
-        },
-        {
-          text: 'Eliminar',
-          role: 'destructive',
-          icon: 'trash-outline',
-          handler: () => {
-            console.log('Eliminar', cat);
-          }
-        },
-        {
-          text: 'Cancelar',
-          icon: 'close',
-          role: 'cancel'
-        }
-      ]
-    });
-
-    await sheet.present();
+  abrirOpcoesCategoria(cat: Categoria) {
+    this.opcoesService.abrirEditarEliminar(
+      'categoria',
+      cat.nome,
+      () => {
+        console.log('Editar categoria', cat);
+      },
+      () => {
+        console.log('Eliminar categoria', cat);
+      }
+    );
   }
 
+  abrirFiltrosCategorias() {
+    this.opcoesService.abrirFiltros(
+      'categorias',
+      () => {
+        // ordem alfabética
+        this.categorias = [...this.categorias].sort((a, b) =>
+          a.nome.localeCompare(b.nome)
+        );
+      },
+      () => {
+        // ordem de criação (assumindo que o array já está na ordem de criação)
+        this.categorias = [...this.categorias]; // aqui podias voltar ao original se o guardares noutro array
+      }
+    );
+  }
 }

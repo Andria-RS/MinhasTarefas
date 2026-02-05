@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ActionSheetController } from '@ionic/angular';
+import { OpcoesService } from '../services/opcoes';
 
 type EstadoProjeto = 'por-fazer' | 'feito';
 
@@ -39,10 +39,13 @@ export class ProjetosPage implements OnInit {
     },
   ];
 
+  // se quiseres restaurar ordem de criação, guarda uma cópia
+  projetosOriginais: Projeto[] = [];
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private actionSheetCtrl: ActionSheetController
+    private opcoesService: OpcoesService
   ) {}
 
   ngOnInit() {
@@ -57,45 +60,45 @@ export class ProjetosPage implements OnInit {
     if (this.categoriaId) {
       const legivel = nomesCategorias[this.categoriaId] || this.categoriaId;
       this.titulo = `Projetos de ${legivel}`;
-      // aqui no futuro filtras this.projetos pela categoriaId
     } else {
       this.titulo = 'Projetos';
     }
+
+    this.projetosOriginais = [...this.projetos];
   }
 
   abrirDetalhe(projeto: Projeto) {
     this.router.navigate(['/detalhe-projeto', projeto.id]);
   }
 
-  async abrirOpcoesProjeto(projeto: Projeto) {
-    const sheet = await this.actionSheetCtrl.create({
-      header: projeto.nome,
-      buttons: [
-        {
-          text: 'Editar',
-          icon: 'create-outline',
-          handler: () => {
-            console.log('Editar projeto', projeto);
-            // TODO: abrir modal / página de edição
-          }
-        },
-        {
-          text: 'Eliminar',
-          role: 'destructive',
-          icon: 'trash-outline',
-          handler: () => {
-            console.log('Eliminar projeto', projeto);
-            // TODO: remover do array/backend
-          }
-        },
-        {
-          text: 'Cancelar',
-          role: 'cancel',
-          icon: 'close-outline'
-        }
-      ]
-    });
+  abrirOpcoesProjeto(projeto: Projeto) {
+    this.opcoesService.abrirEditarEliminar(
+      'projeto',
+      projeto.nome,
+      () => {
+        console.log('Editar projeto', projeto);
+        // TODO: abrir modal/página de edição
+      },
+      () => {
+        console.log('Eliminar projeto', projeto);
+        // TODO: remover do array/backend
+      }
+    );
+  }
 
-    await sheet.present();
+  abrirFiltrosProjetos() {
+    this.opcoesService.abrirFiltros(
+      'projetos',
+      () => {
+        // ordem alfabética
+        this.projetos = [...this.projetos].sort((a, b) =>
+          a.nome.localeCompare(b.nome)
+        );
+      },
+      () => {
+        // ordem de criação original
+        this.projetos = [...this.projetosOriginais];
+      }
+    );
   }
 }
