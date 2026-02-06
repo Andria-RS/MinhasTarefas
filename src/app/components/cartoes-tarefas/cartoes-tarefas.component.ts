@@ -1,4 +1,4 @@
-import { Component, OnInit, Input} from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 
 export interface Tarefa {
   id: number;
@@ -7,7 +7,7 @@ export interface Tarefa {
   descricao: string;
   dataLimite: string;
   estado: 'por-fazer' | 'feito' | 'atrasada';
-  tipo?: 'hoje' | 'atrasadas'; 
+  tipo?: 'hoje' | 'atrasadas';
 }
 
 @Component({
@@ -16,12 +16,19 @@ export interface Tarefa {
   styleUrls: ['./cartoes-tarefas.component.scss'],
   standalone: false,
 })
-export class CartoesTarefasComponent  implements OnInit {
+export class CartoesTarefasComponent {
+
   @Input() tarefa!: Tarefa;
 
+  @Output() abrirDetalhes = new EventEmitter<Tarefa>();
+  @Output() abrirOpcoesProjetos = new EventEmitter<Tarefa>(); // se já tinhas para os 3 pontinhos
 
-  constructor() { }
+  onClickCard() {
+    this.abrirDetalhes.emit(this.tarefa);
+  }
 
-  ngOnInit() {}
-
+  onClickOpcoes(event: Event) {
+    event.stopPropagation();
+    this.abrirOpcoesProjetos.emit(this.tarefa);
+  }
 }

@@ -1,5 +1,5 @@
 <ion-header>
-  <ion-toolbar>
+  <ion-toolbar color="roxo">
     <ion-title>Nova tarefa</ion-title>
     <ion-buttons slot="end">
       <ion-button (click)="fechar()">
@@ -9,9 +9,10 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content fullscreen="true" >
+<ion-content fullscreen="true" class="nova-tarefa-content">
+
   <!-- Imagem da tarefa (visual) -->
-  <ion-item>
+  <ion-item lines="none">
     <ion-label position="stacked">Imagem da tarefa</ion-label>
     <ion-button fill="outline" expand="block" color="medium">
       <ion-icon name="image-outline" slot="start"></ion-icon>
@@ -19,19 +20,19 @@
     </ion-button>
   </ion-item>
 
-  <ion-item lines="none">
+  <ion-item lines="none" class="preview-wrapper">
     <img src="assets/img/exemplo_tarefa.png"
-         style="width: 100%; border-radius: 8px;">
+         alt="Pré-visualização">
   </ion-item>
 
   <!-- Título -->
-  <ion-item>
+  <ion-item lines="full">
     <ion-label position="stacked">Título</ion-label>
     <ion-input placeholder="Ex: Estudar PMEU"></ion-input>
   </ion-item>
 
   <!-- Projeto -->
-  <ion-item>
+  <ion-item lines="full">
     <ion-label position="stacked">Projeto</ion-label>
     <ion-select placeholder="Selecionar projeto">
       <ion-select-option value="faculdade">Faculdade</ion-select-option>
@@ -40,7 +41,7 @@
   </ion-item>
 
   <!-- Data e Hora -->
-  <ion-item>
+  <ion-item lines="full">
     <ion-label position="stacked">Data</ion-label>
     <ion-datetime-button datetime="dt-tarefa"></ion-datetime-button>
   </ion-item>
@@ -52,7 +53,7 @@
   </ion-modal>
 
   <!-- Descrição -->
-  <ion-item>
+  <ion-item lines="full">
     <ion-label position="stacked">Descrição</ion-label>
     <ion-textarea
       auto-grow="true"
@@ -61,7 +62,7 @@
   </ion-item>
 
   <!-- Categoria -->
-  <ion-item>
+  <ion-item lines="full">
     <ion-label position="stacked">Categoria</ion-label>
     <ion-select placeholder="Selecionar categoria">
       <ion-select-option value="faculdade">Faculdade</ion-select-option>

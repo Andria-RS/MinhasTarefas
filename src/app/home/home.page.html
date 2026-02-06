@@ -42,9 +42,11 @@
 <ng-container *ngFor="let tarefa of tarefas">
   <app-cartoes-tarefas
     *ngIf="tarefa.tipo === filtro"
-    [tarefa]="tarefa">
+    [tarefa]="tarefa"
+    (abrirDetalhes)="abrirDetalhesTarefas($event)">
   </app-cartoes-tarefas>
 </ng-container>
+
 
 
 </ion-content>

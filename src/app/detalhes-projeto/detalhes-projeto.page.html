@@ -7,7 +7,9 @@
     <ion-title>{{ projeto.nome }}</ion-title>
 
     <ion-buttons slot="end">
-      <ion-button fill="clear">
+      <ion-button
+        fill="clear"
+        (click)="abrirOpcoesProjeto()">
         <ion-icon name="ellipsis-vertical"></ion-icon>
       </ion-button>
     </ion-buttons>
@@ -36,7 +38,6 @@
       {{ projeto.descricao }}
     </ion-card-content>
   </ion-card>
-
 
   <!-- Título + botão que abre o MESMO modal da home -->
   <ion-item lines="none">
@@ -69,9 +70,9 @@
   <ion-list lines="none">
     <app-cartoes-tarefas
       *ngFor="let tarefa of tarefas"
-      [tarefa]="tarefa">
+      [tarefa]="tarefa"
+      (abrirDetalhes)="abrirDetalhesTarefas($event)">
     </app-cartoes-tarefas>
   </ion-list>
 
-  
 </ion-content>

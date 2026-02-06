@@ -29,3 +29,41 @@ ion-label p {
   margin-top: 15px;       /* quanto maior, mais para baixo */
 }
 
+.projeto-modal {
+  --background: #000;      /* fundo da folha */
+  --backdrop-opacity: 0.6;
+}
+
+.projeto-modal ion-header,
+.projeto-modal ion-toolbar {
+  --background: #111;
+  --color: #fff;
+}
+
+.projeto-modal-content {
+  --background: #000;
+  background: #000;
+  color: #fff;
+}
+
+.projeto-modal-content ion-item {
+  --background: transparent;
+  --color: #fff;
+}
+
+.projeto-modal-content ion-input,
+.projeto-modal-content ion-textarea {
+  --color: #fff;
+}
+
+.preview-wrapper {
+  margin: 12px 0 16px;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.preview-wrapper img {
+  width: 100%;
+  display: block;
+}
+

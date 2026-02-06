@@ -22,6 +22,12 @@ export class CategoriasPage implements OnInit {
     { id: 'trabalho', nome: 'Trabalho', icon: 'briefcase-outline', totalProjetos: 2 },
   ];
 
+  // modal Nova/Editar categoria
+  isModalCategoriaAberto = false;
+  novaCategoriaNome = '';
+  novaCategoriaIcon = '';
+  categoriaEmEdicao: Categoria | null = null;
+
   constructor(
     private router: Router,
     private opcoesService: OpcoesService
@@ -38,10 +44,16 @@ export class CategoriasPage implements OnInit {
       'categoria',
       cat.nome,
       () => {
-        console.log('Editar categoria', cat);
+        // EDITAR → abre o modal preenchido
+        this.categoriaEmEdicao = cat;
+        this.novaCategoriaNome = cat.nome;
+        this.novaCategoriaIcon = cat.icon;
+        this.isModalCategoriaAberto = true;
       },
       () => {
+        // ELIMINAR (por agora só log, se quiseres mesmo apagar descomenta a linha)
         console.log('Eliminar categoria', cat);
+        // this.categorias = this.categorias.filter(c => c.id !== cat.id);
       }
     );
   }
@@ -56,9 +68,51 @@ export class CategoriasPage implements OnInit {
         );
       },
       () => {
-        // ordem de criação (assumindo que o array já está na ordem de criação)
-        this.categorias = [...this.categorias]; // aqui podias voltar ao original se o guardares noutro array
+        // aqui podias restaurar a ordem original se a guardares noutro array
+        this.categorias = [...this.categorias];
       }
     );
+  }
+
+  // -------- NOVA / EDITAR CATEGORIA (sheet modal) --------
+
+  abrirNovaCategoria() {
+    this.categoriaEmEdicao = null;
+    this.novaCategoriaNome = '';
+    this.novaCategoriaIcon = '';
+    this.isModalCategoriaAberto = true;
+  }
+
+  fecharNovaCategoria() {
+    this.isModalCategoriaAberto = false;
+    this.categoriaEmEdicao = null;
+    this.novaCategoriaNome = '';
+    this.novaCategoriaIcon = '';
+  }
+
+  guardarNovaCategoria() {
+    if (!this.novaCategoriaNome.trim()) {
+      return;
+    }
+
+    const nome = this.novaCategoriaNome.trim();
+    const icon = this.novaCategoriaIcon.trim() || 'folder-open-outline';
+
+    if (this.categoriaEmEdicao) {
+      // EDITAR
+      this.categoriaEmEdicao.nome = nome;
+      this.categoriaEmEdicao.icon = icon;
+    } else {
+      // NOVA
+      const nova: Categoria = {
+        id: nome.toLowerCase().replace(/\s+/g, '-'),
+        nome,
+        icon,
+        totalProjetos: 0
+      };
+      this.categorias = [...this.categorias, nova];
+    }
+
+    this.fecharNovaCategoria();
   }
 }

@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { Tarefa } from '../components/cartoes-tarefas/cartoes-tarefas.component';
+import { OpcoesService } from '../services/opcoes';
 
 type EstadoTarefa = 'por-fazer' | 'feito' | 'atrasada';
 
@@ -33,21 +35,42 @@ export class DetalhesProjetoPage implements OnInit {
       titulo: 'Ler apontamentos',
       projeto: 'Estudar PMEU',
       descricao: 'Capítulos 1 a 3',
-      dataLimite: '2026-02-10',
-      estado: 'por-fazer',
-      // tipo opcional se na interface estiver tipo?: ...
+      dataLimite: '10-02-2026, 18:00',
+      estado: 'por-fazer'
     },
     {
       id: 2,
       titulo: 'Fazer exercícios',
       projeto: 'Estudar PMEU',
       descricao: 'Folha 1 de PMEU',
-      dataLimite: '2026-02-12',
-      estado: 'feito',
+      dataLimite: '12-02-2026, 23:59',
+      estado: 'feito'
     }
   ];
 
-  constructor() {}
+  constructor(
+    private opcoesService: OpcoesService,
+    private router: Router
+  ) {}
 
   ngOnInit() {}
+
+  abrirOpcoesProjeto() {
+    this.opcoesService.abrirEditarEliminar(
+      'projeto',
+      this.projeto.nome,
+      () => {
+        console.log('Editar projeto', this.projeto);
+        // aqui depois abres o modal/página para editar o projeto
+      },
+      () => {
+        console.log('Eliminar projeto', this.projeto);
+        // aqui depois apagas o projeto e, por exemplo, navegas para trás
+      }
+    );
+  }
+
+  abrirDetalhesTarefas(tarefa: Tarefa) {
+    this.router.navigate(['/detalhes-tarefas', tarefa.id]);
+  }
 }

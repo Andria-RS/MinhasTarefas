@@ -10,6 +10,8 @@ interface Projeto {
   imagem: string;
   totalTarefas: number;
   estado: EstadoProjeto;
+  descricao?: string;
+  categoriaId?: string;
 }
 
 @Component({
@@ -29,6 +31,8 @@ export class ProjetosPage implements OnInit {
       imagem: 'assets/img/projeto_estudar.png',
       totalTarefas: 5,
       estado: 'por-fazer',
+      descricao: 'Rever matéria, fazer exercícios…',
+      categoriaId: 'escola'
     },
     {
       id: 'p2',
@@ -36,11 +40,19 @@ export class ProjetosPage implements OnInit {
       imagem: 'assets/img/projeto_bd.png',
       totalTarefas: 8,
       estado: 'feito',
+      descricao: 'Trabalho prático de base de dados',
+      categoriaId: 'escola'
     },
   ];
 
-  // se quiseres restaurar ordem de criação, guarda uma cópia
   projetosOriginais: Projeto[] = [];
+
+  // modal Novo/Editar projeto
+  isModalProjetoAberto = false;
+  projetoEmEdicao: Projeto | null = null;
+  novoProjetoNome = '';
+  novoProjetoImagem = '';
+  novoProjetoDescricao = '';
 
   constructor(
     private route: ActivatedRoute,
@@ -60,6 +72,7 @@ export class ProjetosPage implements OnInit {
     if (this.categoriaId) {
       const legivel = nomesCategorias[this.categoriaId] || this.categoriaId;
       this.titulo = `Projetos de ${legivel}`;
+      // no futuro: filtrar projetos por categoriaId
     } else {
       this.titulo = 'Projetos';
     }
@@ -76,12 +89,17 @@ export class ProjetosPage implements OnInit {
       'projeto',
       projeto.nome,
       () => {
-        console.log('Editar projeto', projeto);
-        // TODO: abrir modal/página de edição
+        // EDITAR → abre o mesmo modal, preenchido
+        this.projetoEmEdicao = projeto;
+        this.novoProjetoNome = projeto.nome;
+        this.novoProjetoImagem = projeto.imagem;
+        this.novoProjetoDescricao = projeto.descricao || '';
+        this.isModalProjetoAberto = true;
       },
       () => {
         console.log('Eliminar projeto', projeto);
-        // TODO: remover do array/backend
+        // se quiseres apagar mesmo já:
+        // this.projetos = this.projetos.filter(p => p.id !== projeto.id);
       }
     );
   }
@@ -90,15 +108,63 @@ export class ProjetosPage implements OnInit {
     this.opcoesService.abrirFiltros(
       'projetos',
       () => {
-        // ordem alfabética
         this.projetos = [...this.projetos].sort((a, b) =>
           a.nome.localeCompare(b.nome)
         );
       },
       () => {
-        // ordem de criação original
         this.projetos = [...this.projetosOriginais];
       }
     );
+  }
+
+  // ---------- NOVO / EDITAR PROJETO (sheet modal) ----------
+
+  abrirNovoProjeto() {
+    this.projetoEmEdicao = null;
+    this.novoProjetoNome = '';
+    this.novoProjetoImagem = '';
+    this.novoProjetoDescricao = '';
+    this.isModalProjetoAberto = true;
+  }
+
+  fecharNovoProjeto() {
+    this.isModalProjetoAberto = false;
+    this.projetoEmEdicao = null;
+    this.novoProjetoNome = '';
+    this.novoProjetoImagem = '';
+    this.novoProjetoDescricao = '';
+  }
+
+  guardarProjeto() {
+    if (!this.novoProjetoNome.trim()) {
+      return;
+    }
+
+    const nome = this.novoProjetoNome.trim();
+    const imagem = this.novoProjetoImagem.trim() || 'assets/img/projeto_default.png';
+    const descricao = this.novoProjetoDescricao.trim();
+
+    if (this.projetoEmEdicao) {
+      // EDITAR
+      this.projetoEmEdicao.nome = nome;
+      this.projetoEmEdicao.imagem = imagem;
+      this.projetoEmEdicao.descricao = descricao;
+    } else {
+      // NOVO
+      const novo: Projeto = {
+        id: nome.toLowerCase().replace(/\s+/g, '-'),
+        nome,
+        imagem,
+        descricao,
+        totalTarefas: 0,
+        estado: 'por-fazer',
+        categoriaId: this.categoriaId
+      };
+      this.projetos = [...this.projetos, novo];
+      this.projetosOriginais = [...this.projetos];
+    }
+
+    this.fecharNovoProjeto();
   }
 }

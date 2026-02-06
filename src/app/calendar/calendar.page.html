@@ -16,25 +16,23 @@
       firstDayOfWeek="1"
       locale="pt-PT">
     </ion-datetime>
-  </div>
 
-  <!-- Secção de tarefas do dia selecionado (visual) -->
-  <ion-card class="task-card">
-    <ion-card-header>
-      <ion-card-title>Hoje</ion-card-title>
-      <ion-card-subtitle>1 tarefa(s)</ion-card-subtitle>
-    </ion-card-header>
-
-    <ion-card-content>
+    <div class="tasks-wrapper">
       <ion-item lines="none">
         <ion-label>
-          <h2>Nome da tarefa</h2>
-          <p>12:00</p>
+          <h2>Hoje</h2>
+          <p>{{ tarefasHoje.length }} tarefa(s)</p>
         </ion-label>
-        <ion-badge color="success">Feito</ion-badge>
       </ion-item>
-    </ion-card-content>
-  </ion-card>
+
+      <ion-list lines="none">
+        <app-cartoes-tarefas
+          *ngFor="let tarefa of tarefasHoje"
+          [tarefa]="tarefa">
+        </app-cartoes-tarefas>
+      </ion-list>
+    </div>
+  </div>
 
 </ion-content>
 
