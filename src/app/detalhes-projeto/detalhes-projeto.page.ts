@@ -10,6 +10,7 @@ interface ProjetoFront {
   descricao: string;
   estado: EstadoTarefa;
   categoria: string;
+  imagemUrl: string;
 }
 
 @Component({
@@ -20,15 +21,19 @@ interface ProjetoFront {
 })
 export class DetalhesProjetoPage implements OnInit {
 
+  // sheet "Nova tarefa" deste projeto
   isModalAberto = false;
 
+  // dados do projeto mostrado na página
   projeto: ProjetoFront = {
     nome: 'Estudar PMEU',
     descricao: 'Rever matéria, fazer exercícios e preparar resumo.',
     estado: 'por-fazer',
-    categoria: 'Escola'
+    categoria: 'Escola',
+    imagemUrl: 'assets/imagens/projetos/estudar-pmeu.jpg'
   };
 
+  // tarefas do projeto (mock)
   tarefas: Tarefa[] = [
     {
       id: 1,
@@ -48,6 +53,17 @@ export class DetalhesProjetoPage implements OnInit {
     }
   ];
 
+  // -------- SHEET EDITAR PROJETO --------
+
+  isModalEditarProjetoAberto = false;
+  projetoEditavel!: ProjetoFront;
+
+  categorias = [
+    { id: 'Escola', nome: 'Escola' },
+    { id: 'Trabalho', nome: 'Trabalho' },
+    { id: 'Pessoal', nome: 'Pessoal' }
+  ];
+
   constructor(
     private opcoesService: OpcoesService,
     private router: Router
@@ -55,21 +71,39 @@ export class DetalhesProjetoPage implements OnInit {
 
   ngOnInit() {}
 
+  // 3 pontinhos do header
   abrirOpcoesProjeto() {
     this.opcoesService.abrirEditarEliminar(
       'projeto',
       this.projeto.nome,
-      () => {
-        console.log('Editar projeto', this.projeto);
-        // aqui depois abres o modal/página para editar o projeto
-      },
-      () => {
+      () => this.abrirEditarProjeto(),   // EDITAR
+      () => {                            // ELIMINAR
         console.log('Eliminar projeto', this.projeto);
-        // aqui depois apagas o projeto e, por exemplo, navegas para trás
+        // futuramente: apagar projeto e navegar para trás
+        // this.router.navigate(['/categorias']);
       }
     );
   }
 
+  // abre a sheet de edição
+  abrirEditarProjeto() {
+    this.projetoEditavel = { ...this.projeto };
+    this.isModalEditarProjetoAberto = true;
+  }
+
+  // fecha a sheet sem guardar
+  fecharEditarProjeto() {
+    this.isModalEditarProjetoAberto = false;
+  }
+
+  // guarda alterações feitas no sheet
+  guardarEditarProjeto() {
+    this.projeto = { ...this.projetoEditavel };
+    this.isModalEditarProjetoAberto = false;
+    // aqui depois podes chamar um service para persistir no backend
+  }
+
+  // navegar para detalhes de tarefa
   abrirDetalhesTarefas(tarefa: Tarefa) {
     this.router.navigate(['/detalhes-tarefas', tarefa.id]);
   }

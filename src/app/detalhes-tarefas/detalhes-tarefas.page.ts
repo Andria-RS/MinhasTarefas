@@ -28,6 +28,20 @@ export class DetalhesTarefasPage implements OnInit {
   tarefaId!: number;
   tarefa!: DetalheTarefa;
 
+  isModalEditarAberto = false;
+  tarefaEditavel!: DetalheTarefa;
+
+  projetos = [
+    { id: 'estudar-pmeu', nome: 'Estudar PMEU' },
+    { id: 'trabalho-x', nome: 'Trabalho X' }
+  ];
+
+  categorias = [
+    { id: 'escola', nome: 'escola' },
+    { id: 'trabalho', nome: 'trabalho' },
+    { id: 'pessoal', nome: 'pessoal' }
+  ];
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
@@ -38,19 +52,18 @@ export class DetalhesTarefasPage implements OnInit {
     const idParam = this.route.snapshot.paramMap.get('tarefaId');
     this.tarefaId = idParam ? +idParam : 0;
 
-    // MOCK por agora (depois vens buscar do teu service de tarefas)
     const data = new Date('2026-02-10T18:00:00');
 
     this.tarefa = {
       id: this.tarefaId,
       titulo: 'Ler apontamentos',
-      projeto: 'Estudar PMEU',
+      projeto: 'estudar-pmeu',
       descricao: 'Capítulos 1 a 3, fazer resumo, rever slides.',
       dataLimite: data.toISOString(),
-      dataData: data.toLocaleDateString('pt-PT'),
-      dataHora: data.toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' }),
+      dataData: '10/02/2026',
+      dataHora: '18:00',
       estado: 'por-fazer',
-      categoria: 'Escola',
+      categoria: 'escola',
       imagemUrl: 'assets/imagens/tarefas/estudar.jpg'
     };
   }
@@ -59,15 +72,34 @@ export class DetalhesTarefasPage implements OnInit {
     this.opcoesService.abrirEditarEliminar(
       'tarefa',
       this.tarefa.titulo,
+      () => this.abrirEditarTarefa(),
       () => {
-        // EDITAR → por agora podemos navegar para uma página de edição
-        this.router.navigate(['/editar-tarefa', this.tarefaId]);
-      },
-      () => {
-        // ELIMINAR → depois ligas ao teu serviço de tarefas
         console.log('Eliminar tarefa', this.tarefaId);
         this.router.navigate(['/home']);
       }
     );
+  }
+
+  abrirEditarTarefa() {
+    this.tarefaEditavel = { ...this.tarefa };
+    this.isModalEditarAberto = true;
+  }
+
+  fecharEditarTarefa() {
+    this.isModalEditarAberto = false;
+  }
+
+  guardarEditarTarefa() {
+    if (this.tarefaEditavel.dataLimite) {
+      const d = new Date(this.tarefaEditavel.dataLimite);
+      this.tarefaEditavel.dataData = d.toLocaleDateString('pt-PT');
+      this.tarefaEditavel.dataHora = d.toLocaleTimeString('pt-PT', {
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    }
+
+    this.tarefa = { ...this.tarefaEditavel };
+    this.fecharEditarTarefa();
   }
 }

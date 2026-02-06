@@ -1,0 +1,31 @@
+.editar-projeto-content {
+  --background: #000;
+  background: #000;
+  color: #fff;
+}
+
+.editar-projeto-content ion-item {
+  --background: transparent;
+  --color: #fff;
+}
+
+.editar-projeto-content ion-input,
+.editar-projeto-content ion-textarea {
+  --color: #fff;
+}
+
+.preview-wrapper-projeto {
+  margin-top: 8px;
+  margin-bottom: 16px;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.preview-wrapper-projeto img {
+  width: 100%;
+  display: block;
+}
+
+.btn-guardar-projeto {
+  margin-top: 16px;
+}

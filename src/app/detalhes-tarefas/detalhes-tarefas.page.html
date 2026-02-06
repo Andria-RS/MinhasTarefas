@@ -20,18 +20,16 @@
 
 <ion-content [fullscreen]="true" *ngIf="tarefa">
 
-  <!-- Imagem da tarefa -->
+  <!-- Detalhes (mantidos como tinhas) -->
   <ion-card class="tarefa-img-card">
     <ion-img [src]="tarefa.imagemUrl" alt="Imagem da tarefa"></ion-img>
   </ion-card>
 
-  <!-- Título -->
   <ion-item lines="full">
     <ion-label position="stacked">Título</ion-label>
     <ion-input [(ngModel)]="tarefa.titulo" readonly="true"></ion-input>
   </ion-item>
 
-  <!-- Data + Hora -->
   <ion-grid>
     <ion-row>
       <ion-col size="7">
@@ -49,7 +47,6 @@
     </ion-row>
   </ion-grid>
 
-  <!-- Descrição -->
   <ion-item lines="full">
     <ion-label position="stacked">Descrição</ion-label>
     <ion-textarea
@@ -59,7 +56,6 @@
     </ion-textarea>
   </ion-item>
 
-  <!-- Categoria -->
   <ion-item lines="full">
     <ion-label position="stacked">Categoria</ion-label>
     <ion-select [value]="tarefa.categoria" interface="popover" disabled="true">
@@ -69,7 +65,6 @@
     </ion-select>
   </ion-item>
 
-  <!-- Estado -->
   <ion-item lines="full">
     <ion-label position="stacked">Estado</ion-label>
     <ion-select [value]="tarefa.estado" interface="popover" disabled="true">
@@ -79,4 +74,123 @@
     </ion-select>
   </ion-item>
 
+  <!-- SHEET EDITAR TAREFA – estilos e classes próprias -->
+  <ion-modal
+    [isOpen]="isModalEditarAberto"
+    (didDismiss)="fecharEditarTarefa()"
+    class="sheet-modal"
+    [breakpoints]="[0, 1]"
+    [initialBreakpoint]="1"
+  >
+    <ng-template>
+      <ion-header>
+        <ion-toolbar color="roxo">
+          <ion-title>Editar tarefa</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="fecharEditarTarefa()">
+              <ion-icon name="close"></ion-icon>
+            </ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+
+      <ion-content fullscreen="true" class="editar-tarefa-content">
+
+        <!-- Imagem -->
+        <ion-item lines="none">
+          <ion-label position="stacked">Imagem da tarefa</ion-label>
+          <ion-button fill="outline" expand="block" color="medium">
+            <ion-icon name="image-outline" slot="start"></ion-icon>
+            <ion-label>Escolher imagem</ion-label>
+          </ion-button>
+        </ion-item>
+
+        <ion-item lines="none" class="preview-wrapper-editar">
+          <img
+            [src]="tarefaEditavel.imagemUrl"
+            alt="Pré-visualização">
+        </ion-item>
+
+        <!-- Título -->
+        <ion-item lines="full">
+          <ion-label position="stacked">Título</ion-label>
+          <ion-input
+            placeholder="Ex: Estudar PMEU"
+            [(ngModel)]="tarefaEditavel.titulo">
+          </ion-input>
+        </ion-item>
+
+        <!-- Projeto -->
+        <ion-item lines="full">
+          <ion-label position="stacked">Projeto</ion-label>
+          <ion-select
+            placeholder="Selecionar projeto"
+            [(ngModel)]="tarefaEditavel.projeto">
+            <ion-select-option *ngFor="let p of projetos" [value]="p.id">
+              {{ p.nome }}
+            </ion-select-option>
+          </ion-select>
+        </ion-item>
+
+        <!-- Data e Hora (com popover próprio) -->
+        <ion-item lines="full">
+          <ion-label position="stacked">Data</ion-label>
+          <ion-datetime-button datetime="dt-editar-tarefa"></ion-datetime-button>
+        </ion-item>
+
+        <ion-popover [keepContentsMounted]="true">
+          <ng-template>
+            <ion-datetime
+              id="dt-editar-tarefa"
+              presentation="date-time"
+              [(ngModel)]="tarefaEditavel.dataLimite">
+            </ion-datetime>
+          </ng-template>
+        </ion-popover>
+
+        <!-- Descrição -->
+        <ion-item lines="full">
+          <ion-label position="stacked">Descrição</ion-label>
+          <ion-textarea
+            auto-grow="true"
+            placeholder="Escreve aqui os detalhes da tarefa..."
+            [(ngModel)]="tarefaEditavel.descricao">
+          </ion-textarea>
+        </ion-item>
+
+        <!-- Categoria -->
+        <ion-item lines="full">
+          <ion-label position="stacked">Categoria</ion-label>
+          <ion-select
+            placeholder="Selecionar categoria"
+            [(ngModel)]="tarefaEditavel.categoria">
+            <ion-select-option *ngFor="let c of categorias" [value]="c.id">
+              {{ c.nome }}
+            </ion-select-option>
+          </ion-select>
+        </ion-item>
+
+        <!-- Estado -->
+        <ion-item lines="full">
+          <ion-label position="stacked">Estado</ion-label>
+          <ion-select [(ngModel)]="tarefaEditavel.estado">
+            <ion-select-option value="por-fazer">Por fazer</ion-select-option>
+            <ion-select-option value="feito">Feito</ion-select-option>
+            <ion-select-option value="atrasada">Atrasada</ion-select-option>
+          </ion-select>
+        </ion-item>
+
+        <!-- Botão Guardar -->
+        <ion-button
+          expand="block"
+          color="roxo"
+          class="btn-guardar-editar"
+          (click)="guardarEditarTarefa()"
+        >
+          Guardar alterações
+        </ion-button>
+
+      </ion-content>
+    </ng-template>
+  </ion-modal>
 </ion-content>

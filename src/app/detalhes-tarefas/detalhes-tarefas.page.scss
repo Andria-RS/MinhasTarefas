@@ -1,9 +1,49 @@
+/* Página de detalhes */
 .tarefa-img-card {
   margin: 12px;
   ion-img {
     width: 100%;
     height: 180px;
     object-fit: cover;
+    object-position: center;
     border-radius: 12px;
   }
+}
+
+/* Sheet modal arredondada */
+.sheet-modal {
+  --border-radius: 16px 16px 0 0;
+}
+
+/* Estilos da sheet de EDITAR (separados da “Nova tarefa”) */
+.editar-tarefa-content {
+  --background: #000;
+  background: #000;
+  color: #fff;
+}
+
+.editar-tarefa-content ion-item {
+  --background: transparent;
+  --color: #fff;
+}
+
+.editar-tarefa-content ion-input,
+.editar-tarefa-content ion-textarea {
+  --color: #fff;
+}
+
+.preview-wrapper-editar {
+  margin-top: 8px;
+  margin-bottom: 16px;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.preview-wrapper-editar img {
+  width: 100%;
+  display: block;
+}
+
+.btn-guardar-editar {
+  margin-top: 16px;
 }
