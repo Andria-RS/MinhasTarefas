@@ -7,7 +7,7 @@ export interface Tarefa {
   descricao: string;
   dataLimite: string;
   estado: 'por-fazer' | 'feito' | 'atrasada';
-  tipo?: 'hoje' | 'atrasadas';
+  tipo?: 'hoje' | 'proximas' | 'atrasadas';
 }
 
 @Component({
