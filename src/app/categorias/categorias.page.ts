@@ -1,12 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { OpcoesService } from '../services/opcoes';
+import { CategoriesService } from '../services/categories.service';
+import { Category } from '../services/category';
 
 interface Categoria {
-  id: string;
+  id: number;
   nome: string;
   icon: string;
-  totalProjetos: number;
+  totalProjetos?: number;
 }
 
 @Component({
@@ -17,10 +19,7 @@ interface Categoria {
 })
 export class CategoriasPage implements OnInit {
 
-  categorias: Categoria[] = [
-    { id: 'escola',   nome: 'Escola',   icon: 'school-outline',    totalProjetos: 3 },
-    { id: 'trabalho', nome: 'Trabalho', icon: 'briefcase-outline', totalProjetos: 2 },
-  ];
+  categorias: Categoria[] = [];
 
   // modal Nova/Editar categoria
   isModalCategoriaAberto = false;
@@ -30,10 +29,39 @@ export class CategoriasPage implements OnInit {
 
   constructor(
     private router: Router,
-    private opcoesService: OpcoesService
+    private opcoesService: OpcoesService,
+    private categoriesService: CategoriesService
   ) {}
 
-  ngOnInit() {}
+  async ngOnInit() {
+    await this.carregarCategorias();
+  }
+
+  async ionViewWillEnter() {
+    await this.carregarCategorias();
+  }
+
+  private mapCategoryToCategoria(cat: Category): Categoria {
+    return {
+      id: cat.id ?? 0,
+      nome: cat.name,
+      icon: cat.icon || 'folder-open-outline',
+      totalProjetos: 0 // mais tarde podemos calcular com base na tabela projects
+    };
+  }
+
+  private mapCategoriaToCategory(cat: Categoria): Category {
+    return {
+      id: cat.id,
+      name: cat.nome,
+      icon: cat.icon
+    };
+  }
+
+  async carregarCategorias() {
+    const cats = await this.categoriesService.getAllCategories();
+    this.categorias = cats.map(c => this.mapCategoryToCategoria(c));
+  }
 
   abrirProjetos(cat: Categoria) {
     this.router.navigate(['/projetos', cat.id]);
@@ -45,15 +73,15 @@ export class CategoriasPage implements OnInit {
       cat.nome,
       () => {
         // EDITAR → abre o modal preenchido
-        this.categoriaEmEdicao = cat;
+        this.categoriaEmEdicao = { ...cat };
         this.novaCategoriaNome = cat.nome;
         this.novaCategoriaIcon = cat.icon;
         this.isModalCategoriaAberto = true;
       },
-      () => {
-        // ELIMINAR (por agora só log, se quiseres mesmo apagar descomenta a linha)
-        console.log('Eliminar categoria', cat);
-        // this.categorias = this.categorias.filter(c => c.id !== cat.id);
+      async () => {
+        // ELIMINAR
+        await this.categoriesService.deleteCategory(cat.id);
+        await this.carregarCategorias();
       }
     );
   }
@@ -68,8 +96,8 @@ export class CategoriasPage implements OnInit {
         );
       },
       () => {
-        // aqui podias restaurar a ordem original se a guardares noutro array
-        this.categorias = [...this.categorias];
+        // por enquanto não temos "ordem original" guardada, só recarregar da BD
+        this.carregarCategorias();
       }
     );
   }
@@ -90,7 +118,7 @@ export class CategoriasPage implements OnInit {
     this.novaCategoriaIcon = '';
   }
 
-  guardarNovaCategoria() {
+  async guardarNovaCategoria() {
     if (!this.novaCategoriaNome.trim()) {
       return;
     }
@@ -100,19 +128,26 @@ export class CategoriasPage implements OnInit {
 
     if (this.categoriaEmEdicao) {
       // EDITAR
-      this.categoriaEmEdicao.nome = nome;
-      this.categoriaEmEdicao.icon = icon;
+      const catAtualizada: Categoria = {
+        ...this.categoriaEmEdicao,
+        nome,
+        icon
+      };
+
+      await this.categoriesService.updateCategory(
+        this.mapCategoriaToCategory(catAtualizada)
+      );
     } else {
       // NOVA
-      const nova: Categoria = {
-        id: nome.toLowerCase().replace(/\s+/g, '-'),
-        nome,
-        icon,
-        totalProjetos: 0
+      const novaCategoria: Category = {
+        name: nome,
+        icon
       };
-      this.categorias = [...this.categorias, nova];
+
+      await this.categoriesService.insertCategory(novaCategoria);
     }
 
+    await this.carregarCategorias();
     this.fecharNovaCategoria();
   }
 }

@@ -1,17 +1,20 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { OpcoesService } from '../services/opcoes';
+import { ProjectsService, Project } from '../services/projects.service';
+import { CategoriesService } from '../services/categories.service';
+import { Category } from '../services/category';
 
 type EstadoProjeto = 'por-fazer' | 'feito';
 
 interface Projeto {
-  id: string;
+  id: number;
   nome: string;
   imagem: string;
   totalTarefas: number;
   estado: EstadoProjeto;
   descricao?: string;
-  categoriaId?: string;
+  categoriaId: number;
 }
 
 @Component({
@@ -21,30 +24,10 @@ interface Projeto {
   standalone: false
 })
 export class ProjetosPage implements OnInit {
-  categoriaId!: string;
+  categoriaId!: number;
   titulo = 'Projetos';
 
-  projetos: Projeto[] = [
-    {
-      id: 'p1',
-      nome: 'Estudar PMEU',
-      imagem: 'assets/img/projeto_estudar.png',
-      totalTarefas: 5,
-      estado: 'por-fazer',
-      descricao: 'Rever matéria, fazer exercícios…',
-      categoriaId: 'escola'
-    },
-    {
-      id: 'p2',
-      nome: 'Trabalho de BD',
-      imagem: 'assets/img/projeto_bd.png',
-      totalTarefas: 8,
-      estado: 'feito',
-      descricao: 'Trabalho prático de base de dados',
-      categoriaId: 'escola'
-    },
-  ];
-
+  projetos: Projeto[] = [];
   projetosOriginais: Projeto[] = [];
 
   // modal Novo/Editar projeto
@@ -57,51 +40,68 @@ export class ProjetosPage implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private opcoesService: OpcoesService
+    private opcoesService: OpcoesService,
+    private projectsService: ProjectsService,
+    private categoriesService: CategoriesService
   ) {}
 
-  ngOnInit() {
-    this.categoriaId = this.route.snapshot.paramMap.get('categoriaId') || '';
-
-    const nomesCategorias: Record<string, string> = {
-      escola: 'Escola',
-      trabalho: 'Trabalho',
-      casa: 'Casa'
-    };
+  async ngOnInit() {
+    const param = this.route.snapshot.paramMap.get('categoriaId');
+    this.categoriaId = param ? Number(param) : 0;
 
     if (this.categoriaId) {
-      const legivel = nomesCategorias[this.categoriaId] || this.categoriaId;
-      this.titulo = `Projetos de ${legivel}`;
-      // no futuro: filtrar projetos por categoriaId
+      const categoria: Category | null =
+        await this.categoriesService.getCategoryById(this.categoriaId);
+      this.titulo = categoria
+        ? `Projetos de ${categoria.name}`
+        : 'Projetos';
     } else {
       this.titulo = 'Projetos';
     }
 
+    await this.carregarProjetos();
+  }
+
+  private mapProjectToProjeto(p: Project): Projeto {
+    return {
+      id: p.id ?? 0,
+      nome: p.name,
+      imagem: p.image_url || 'assets/img/projeto_default.png',
+      descricao: p.description,
+      categoriaId: p.category_id,
+      estado: (p.status as EstadoProjeto) || 'por-fazer',
+      totalTarefas: p.total_tasks ?? 0
+    };
+  }
+
+  private mapProjetoToProject(p: Projeto): Project {
+    return {
+      id: p.id,
+      name: p.nome,
+      description: p.descricao,
+      image_url: p.imagem,
+      category_id: p.categoriaId,
+      status: p.estado,
+      total_tasks: p.totalTarefas
+    };
+  }
+
+  async carregarProjetos() {
+    if (!this.categoriaId) {
+      this.projetos = [];
+      this.projetosOriginais = [];
+      return;
+    }
+
+    const data = await this.projectsService.getProjectsByCategory(
+      this.categoriaId
+    );
+    this.projetos = data.map(d => this.mapProjectToProjeto(d));
     this.projetosOriginais = [...this.projetos];
   }
 
   abrirDetalhe(projeto: Projeto) {
     this.router.navigate(['/detalhe-projeto', projeto.id]);
-  }
-
-  abrirOpcoesProjeto(projeto: Projeto) {
-    this.opcoesService.abrirEditarEliminar(
-      'projeto',
-      projeto.nome,
-      () => {
-        // EDITAR → abre o mesmo modal, preenchido
-        this.projetoEmEdicao = projeto;
-        this.novoProjetoNome = projeto.nome;
-        this.novoProjetoImagem = projeto.imagem;
-        this.novoProjetoDescricao = projeto.descricao || '';
-        this.isModalProjetoAberto = true;
-      },
-      () => {
-        console.log('Eliminar projeto', projeto);
-        // se quiseres apagar mesmo já:
-        // this.projetos = this.projetos.filter(p => p.id !== projeto.id);
-      }
-    );
   }
 
   abrirFiltrosProjetos() {
@@ -136,35 +136,39 @@ export class ProjetosPage implements OnInit {
     this.novoProjetoDescricao = '';
   }
 
-  guardarProjeto() {
-    if (!this.novoProjetoNome.trim()) {
+  async guardarProjeto() {
+    if (!this.novoProjetoNome.trim() || !this.categoriaId) {
       return;
     }
 
     const nome = this.novoProjetoNome.trim();
-    const imagem = this.novoProjetoImagem.trim() || 'assets/img/projeto_default.png';
+    const imagem =
+      this.novoProjetoImagem.trim() || 'assets/img/projeto_default.png';
     const descricao = this.novoProjetoDescricao.trim();
 
     if (this.projetoEmEdicao) {
       // EDITAR
-      this.projetoEmEdicao.nome = nome;
-      this.projetoEmEdicao.imagem = imagem;
-      this.projetoEmEdicao.descricao = descricao;
-    } else {
-      // NOVO
-      const novo: Projeto = {
-        id: nome.toLowerCase().replace(/\s+/g, '-'),
+      const atualizado: Projeto = {
+        ...this.projetoEmEdicao,
         nome,
         imagem,
-        descricao,
-        totalTarefas: 0,
-        estado: 'por-fazer',
-        categoriaId: this.categoriaId
+        descricao
       };
-      this.projetos = [...this.projetos, novo];
-      this.projetosOriginais = [...this.projetos];
+      await this.projectsService.updateProject(
+        this.mapProjetoToProject(atualizado)
+      );
+    } else {
+      // NOVO
+      await this.projectsService.insertProject({
+        name: nome,
+        description: descricao,
+        image_url: imagem,
+        category_id: this.categoriaId,
+        status: 'por-fazer'
+      });
     }
 
+    await this.carregarProjetos();
     this.fecharNovoProjeto();
   }
 }

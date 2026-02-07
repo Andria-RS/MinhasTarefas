@@ -28,30 +28,36 @@ export class HomePage {
   }
 
   private mapTaskToTarefa(task: Task, todayStr: string): Tarefa {
-    // montar string data/hora legível
+    // data/hora legível
     let dataLegivel = '';
+    let deadline: Date | null = null;
+
     if (task.due_date) {
       const base = task.due_date;                  // 'YYYY-MM-DD'
       const time = task.due_time || '00:00:00';    // 'HH:MM:SS'
       const iso = `${base}T${time}`;
       const d = new Date(iso);
+      deadline = d;
+
       dataLegivel =
         d.toLocaleDateString('pt-PT') +
         ', ' +
         d.toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' });
     }
 
-    // estado
+    const now = new Date();
+
+    // estado (considera data + hora)
     let estado: 'por-fazer' | 'feito' | 'atrasada';
     if (task.completed) {
       estado = 'feito';
-    } else if (task.due_date < todayStr) {
+    } else if (deadline && deadline < now) {
       estado = 'atrasada';
     } else {
       estado = 'por-fazer';
     }
 
-    // tipo para o segment (hoje / próximas / atrasadas)
+    // tipo (para os segmentos, só pela data)
     let tipo: 'hoje' | 'proximas' | 'atrasadas';
     if (task.due_date === todayStr) {
       tipo = 'hoje';
@@ -79,7 +85,7 @@ export class HomePage {
     const dd = String(hoje.getDate()).padStart(2, '0');
     const todayStr = `${yyyy}-${mm}-${dd}`;
 
-    // POR ENQUANTO: buscar tarefas de um projeto fixo (id 1) ou ajusta para o que tiveres
+    // por agora: tarefas de um projeto fixo (ajusta quando tiveres projects ligados)
     const tasks: Task[] = await this.tasksService.getTasksByProject(1);
 
     this.tarefas = tasks.map(t => this.mapTaskToTarefa(t, todayStr));
