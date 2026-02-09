@@ -52,6 +52,21 @@ export class ProjectsService {
     return data as Project;
   }
 
+  async getAllProjects(): Promise<Project[]> {
+    const { data, error } = await this.supabaseClient
+      .from('projects')
+      .select('*')
+      .order('name', { ascending: true });
+
+    if (error) {
+      console.error(error);
+      return [];
+    }
+
+    return data as Project[];
+  }
+
+
   async insertProject(project: Project): Promise<Project | null> {
     const { data, error } = await this.supabaseClient
       .from('projects')
