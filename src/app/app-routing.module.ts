@@ -38,11 +38,6 @@ const routes: Routes = [
       import('./detalhes-projeto/detalhes-projeto.module').then( m => m.DetalhesProjetoPageModule)
   },
   {
-  path: 'detalhe-projeto/:projetoId',
-  loadChildren: () => 
-    import('./detalhes-projeto/detalhes-projeto.module').then(m => m.DetalhesProjetoPageModule)
-  },
-  {
     path: 'detalhes-tarefas',
     loadChildren: () => import('./detalhes-tarefas/detalhes-tarefas.module').then( m => m.DetalhesTarefasPageModule)
   },

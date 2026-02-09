@@ -6,7 +6,6 @@ export interface Project {
   id?: number;
   name: string;
   description?: string;
-  image_url?: string;
   category_id: number;
   status?: 'por-fazer' | 'feito';
   total_tasks?: number;
@@ -59,7 +58,6 @@ export class ProjectsService {
       .insert({
         name: project.name,
         description: project.description,
-        image_url: project.image_url,
         category_id: project.category_id,
         status: project.status ?? 'por-fazer'
       })
@@ -74,13 +72,15 @@ export class ProjectsService {
   }
 
   async updateProject(project: Project): Promise<void> {
+    console.log('updateProject RECEBE', project);
+
     const { error } = await this.supabaseClient
       .from('projects')
       .update({
         name: project.name,
         description: project.description,
-        image_url: project.image_url,
-        status: project.status
+        status: project.status,
+        category_id: project.category_id   // <-- linha que faltava
       })
       .eq('id', project.id);
 
@@ -89,6 +89,7 @@ export class ProjectsService {
       throw new Error('Erro ao atualizar projeto');
     }
   }
+
 
   async deleteProject(id: number): Promise<void> {
     const { error } = await this.supabaseClient

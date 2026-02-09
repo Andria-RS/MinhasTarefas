@@ -5,7 +5,7 @@ import { DetalhesProjetoPage } from './detalhes-projeto.page';
 
 const routes: Routes = [
   {
-    path: '',
+    path: ':id',           // <- aqui é que estava a faltar
     component: DetalhesProjetoPage
   }
 ];

@@ -10,7 +10,6 @@ type EstadoProjeto = 'por-fazer' | 'feito';
 interface Projeto {
   id: number;
   nome: string;
-  imagem: string;
   totalTarefas: number;
   estado: EstadoProjeto;
   descricao?: string;
@@ -34,7 +33,6 @@ export class ProjetosPage implements OnInit {
   isModalProjetoAberto = false;
   projetoEmEdicao: Projeto | null = null;
   novoProjetoNome = '';
-  novoProjetoImagem = '';
   novoProjetoDescricao = '';
 
   constructor(
@@ -62,11 +60,14 @@ export class ProjetosPage implements OnInit {
     await this.carregarProjetos();
   }
 
+  async ionViewWillEnter() {
+    await this.carregarProjetos();
+  }
+
   private mapProjectToProjeto(p: Project): Projeto {
     return {
       id: p.id ?? 0,
       nome: p.name,
-      imagem: p.image_url || 'assets/img/projeto_default.png',
       descricao: p.description,
       categoriaId: p.category_id,
       estado: (p.status as EstadoProjeto) || 'por-fazer',
@@ -79,7 +80,6 @@ export class ProjetosPage implements OnInit {
       id: p.id,
       name: p.nome,
       description: p.descricao,
-      image_url: p.imagem,
       category_id: p.categoriaId,
       status: p.estado,
       total_tasks: p.totalTarefas
@@ -101,7 +101,7 @@ export class ProjetosPage implements OnInit {
   }
 
   abrirDetalhe(projeto: Projeto) {
-    this.router.navigate(['/detalhe-projeto', projeto.id]);
+    this.router.navigate(['/detalhes-projeto', projeto.id]);
   }
 
   abrirFiltrosProjetos() {
@@ -123,7 +123,6 @@ export class ProjetosPage implements OnInit {
   abrirNovoProjeto() {
     this.projetoEmEdicao = null;
     this.novoProjetoNome = '';
-    this.novoProjetoImagem = '';
     this.novoProjetoDescricao = '';
     this.isModalProjetoAberto = true;
   }
@@ -132,7 +131,6 @@ export class ProjetosPage implements OnInit {
     this.isModalProjetoAberto = false;
     this.projetoEmEdicao = null;
     this.novoProjetoNome = '';
-    this.novoProjetoImagem = '';
     this.novoProjetoDescricao = '';
   }
 
@@ -142,8 +140,6 @@ export class ProjetosPage implements OnInit {
     }
 
     const nome = this.novoProjetoNome.trim();
-    const imagem =
-      this.novoProjetoImagem.trim() || 'assets/img/projeto_default.png';
     const descricao = this.novoProjetoDescricao.trim();
 
     if (this.projetoEmEdicao) {
@@ -151,7 +147,6 @@ export class ProjetosPage implements OnInit {
       const atualizado: Projeto = {
         ...this.projetoEmEdicao,
         nome,
-        imagem,
         descricao
       };
       await this.projectsService.updateProject(
@@ -162,7 +157,6 @@ export class ProjetosPage implements OnInit {
       await this.projectsService.insertProject({
         name: nome,
         description: descricao,
-        image_url: imagem,
         category_id: this.categoriaId,
         status: 'por-fazer'
       });

@@ -1,10 +1,10 @@
 <ion-header [translucent]="true">
   <ion-toolbar color="roxo">
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="/categorias"></ion-back-button>
+      <ion-back-button defaultHref="/tabs/categorias"></ion-back-button>
     </ion-buttons>
 
-    <ion-title>{{ projeto.nome }}</ion-title>
+    <ion-title>{{ projeto?.nome }}</ion-title>
 
     <ion-buttons slot="end">
       <ion-button
@@ -19,7 +19,7 @@
 <ion-content>
 
   <!-- card com info do projeto -->
-  <ion-card>
+  <ion-card *ngIf="projeto">
     <ion-card-header>
       <ion-card-title>{{ projeto.nome }}</ion-card-title>
       <ion-card-subtitle>
@@ -28,9 +28,6 @@
         </ion-badge>
         <ion-badge color="success" *ngIf="projeto.estado === 'feito'">
           Feito
-        </ion-badge>
-        <ion-badge color="danger" *ngIf="projeto.estado === 'atrasada'">
-          Atrasada
         </ion-badge>
       </ion-card-subtitle>
     </ion-card-header>
@@ -59,6 +56,7 @@
       <ng-template>
         <!-- modal igual ao da home, mas já com categoria e projeto -->
         <app-nova-tarefa
+          *ngIf="projeto"
           [categoria]="projeto.categoria"
           [projeto]="projeto.nome">
         </app-nova-tarefa>
@@ -97,21 +95,6 @@
 
       <ion-content fullscreen="true" class="editar-projeto-content">
 
-        <!-- Imagem do projeto (igual vibe editar tarefa) -->
-        <ion-item lines="none">
-          <ion-label position="stacked">Imagem do projeto</ion-label>
-          <ion-button fill="outline" expand="block" color="medium">
-            <ion-icon name="image-outline" slot="start"></ion-icon>
-            <ion-label>Escolher imagem</ion-label>
-          </ion-button>
-        </ion-item>
-
-        <ion-item lines="none" class="preview-wrapper-projeto">
-          <img
-            [src]="projetoEditavel.imagemUrl"
-            alt="Pré-visualização">
-        </ion-item>
-
         <!-- Nome -->
         <ion-item lines="full">
           <ion-label position="stacked">Nome</ion-label>
@@ -130,9 +113,10 @@
         <!-- Categoria -->
         <ion-item lines="full">
           <ion-label position="stacked">Categoria</ion-label>
-          <ion-select [(ngModel)]="projetoEditavel.categoria">
+          <ion-select *ngIf="categorias.length"
+                      [(ngModel)]="projetoEditavel.categoriaId">
             <ion-select-option *ngFor="let c of categorias" [value]="c.id">
-              {{ c.nome }}
+              {{ c.name }}
             </ion-select-option>
           </ion-select>
         </ion-item>
@@ -143,7 +127,6 @@
           <ion-select [(ngModel)]="projetoEditavel.estado">
             <ion-select-option value="por-fazer">Por fazer</ion-select-option>
             <ion-select-option value="feito">Feito</ion-select-option>
-            <ion-select-option value="atrasada">Atrasada</ion-select-option>
           </ion-select>
         </ion-item>
 
@@ -158,7 +141,5 @@
       </ion-content>
     </ng-template>
   </ion-modal>
-
-
 
 </ion-content>
