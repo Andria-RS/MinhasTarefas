@@ -5,6 +5,8 @@ import { OpcoesService } from '../services/opcoes';
 import { ProjectsService, Project } from '../services/projects.service';
 import { CategoriesService } from '../services/categories.service';
 import { Category } from '../services/category';
+import { TasksService } from '../services/tasks.service';
+import { Task } from '../services/task';
 
 type EstadoProjeto = 'por-fazer' | 'feito';
 type EstadoTarefa = 'por-fazer' | 'feito' | 'atrasada';
@@ -32,25 +34,8 @@ export class DetalhesProjetoPage implements OnInit {
   // dados do projeto mostrado na página (vêm da BD)
   projeto!: ProjetoFront;
 
-  // tarefas do projeto (por enquanto mock)
-  tarefas: Tarefa[] = [
-    {
-      id: 1,
-      titulo: 'Ler apontamentos',
-      projeto: 'Estudar PMEU',
-      descricao: 'Capítulos 1 a 3',
-      dataLimite: '10-02-2026, 18:00',
-      estado: 'por-fazer'
-    },
-    {
-      id: 2,
-      titulo: 'Fazer exercícios',
-      projeto: 'Estudar PMEU',
-      descricao: 'Folha 1 de PMEU',
-      dataLimite: '12-02-2026, 23:59',
-      estado: 'feito'
-    }
-  ];
+  // tarefas do projeto (vêm da BD)
+  tarefas: Tarefa[] = [];
 
   // -------- SHEET EDITAR PROJETO --------
   isModalEditarProjetoAberto = false;
@@ -64,7 +49,8 @@ export class DetalhesProjetoPage implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private projectsService: ProjectsService,
-    private categoriesService: CategoriesService
+    private categoriesService: CategoriesService,
+    private tasksService: TasksService
   ) {}
 
   async ngOnInit() {
@@ -82,13 +68,15 @@ export class DetalhesProjetoPage implements OnInit {
     // 1) Carrega o projeto (com categoriaId)
     await this.carregarProjeto(projectId);
 
-    // 2) Só depois carrega as categorias
+    // 2) Carrega as tarefas reais deste projeto
+    await this.carregarTarefasDoProjeto(this.projeto.id, this.projeto.nome);
+
+    // 3) Só depois carrega as categorias
     this.categorias = await this.categoriesService.getAllCategories();
     console.log('categorias =', this.categorias);
   }
 
-
-  // --------- MAP BD → FRONT ---------
+  // --------- MAP BD → FRONT (PROJETO) ---------
 
   private mapProjectToFront(p: Project): ProjetoFront {
     return {
@@ -108,6 +96,59 @@ export class DetalhesProjetoPage implements OnInit {
       description: p.descricao,
       category_id: p.categoriaId,
       status: p.estado
+    };
+  }
+
+  // --------- MAP BD → FRONT (TAREFA, igual à home) ---------
+
+  private mapTaskToTarefa(task: Task, todayStr: string, projectName: string): Tarefa {
+    // data/hora legível
+    let dataLegivel = '';
+    let deadline: Date | null = null;
+
+    if (task.due_date) {
+      const base = task.due_date;                 // 'YYYY-MM-DD'
+      const time = task.due_time || '00:00:00';   // 'HH:MM:SS'
+      const iso = `${base}T${time}`;
+      const d = new Date(iso);
+      deadline = d;
+
+      dataLegivel =
+        d.toLocaleDateString('pt-PT') +
+        ', ' +
+        d.toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' });
+    }
+
+    const now = new Date();
+
+    // estado (considera data + hora)
+    let estado: 'por-fazer' | 'feito' | 'atrasada';
+    if (task.completed) {
+      estado = 'feito';
+    } else if (deadline && deadline < now) {
+      estado = 'atrasada';
+    } else {
+      estado = 'por-fazer';
+    }
+
+    // tipo aqui não interessa para filtragem, mas mantemos o campo
+    let tipo: 'hoje' | 'proximas' | 'atrasadas';
+    if (task.due_date === todayStr) {
+      tipo = 'hoje';
+    } else if (task.due_date && task.due_date < todayStr) {
+      tipo = 'atrasadas';
+    } else {
+      tipo = 'proximas';
+    }
+
+    return {
+      id: task.id || 0,
+      titulo: task.title,
+      projeto: projectName,           // aqui usamos o nome REAL do projeto
+      descricao: task.description || '',
+      dataLimite: dataLegivel,
+      estado,
+      tipo
     };
   }
 
@@ -132,6 +173,25 @@ export class DetalhesProjetoPage implements OnInit {
     this.projeto.categoria = categoria ? categoria.name : 'Sem categoria';
 
     console.log('this.projeto =', this.projeto);
+  }
+
+  // --------- CARREGAR TAREFAS DO PROJETO ---------
+
+  private async carregarTarefasDoProjeto(projectId: number, projectName: string) {
+    console.log('carregarTarefasDoProjeto()', projectId);
+
+    // construir todayStr tal como na home
+    const hoje = new Date();
+    const yyyy = hoje.getFullYear();
+    const mm = String(hoje.getMonth() + 1).padStart(2, '0');
+    const dd = String(hoje.getDate()).padStart(2, '0');
+    const todayStr = `${yyyy}-${mm}-${dd}`;
+
+    const tasks = await this.tasksService.getTasksByProject(projectId);
+    console.log('tarefas BD =', tasks);
+
+    this.tarefas = tasks.map(t => this.mapTaskToTarefa(t, todayStr, projectName));
+    console.log('tarefas FRONT =', this.tarefas);
   }
 
   // 3 pontinhos do header
