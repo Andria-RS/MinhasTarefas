@@ -242,12 +242,11 @@ export class DetalhesProjetoPage implements OnInit {
     this.router.navigate(['/detalhes-tarefas', tarefa.id]);
   }
 
-  // handler do didDismiss do modal de nova tarefa
-  async onModalNovaTarefaDismiss(ev: any) {
+  // chamado pelo (fecharModal) do componente de nova tarefa
+  async onNovaTarefaProjetoFechar(task: Task | null) {
     this.isModalAberto = false;
 
-    const data = ev?.detail?.data;
-    if (data && this.projeto) {
+    if (task && this.projeto) {
       await this.carregarTarefasDoProjeto(this.projeto.id, this.projeto.nome);
     }
   }
