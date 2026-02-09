@@ -57,7 +57,8 @@
         <app-nova-tarefa
           *ngIf="projeto"
           [projeto]="projeto.id"
-          [categoria]="projeto.categoria">
+          [categoria]="projeto.categoria"
+          (fecharModal)="onNovaTarefaProjetoFechar($event)">
         </app-nova-tarefa>
       </ng-template>
     </ion-modal>

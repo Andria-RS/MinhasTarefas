@@ -14,6 +14,20 @@ export class TasksService {
     this.supabaseClient = getSupabase();
   }
 
+  async getAllTasks(): Promise<Task[]> {
+    const { data, error } = await this.supabaseClient
+      .from('tasks')
+      .select('*')
+      .order('due_date', { ascending: true });
+
+    if (error) {
+      console.error(error);
+      return [];
+    }
+
+    return data as Task[];
+  }
+
   async getTasksByProject(projectId: number): Promise<Task[]> {
     const { data, error } = await this.supabaseClient
       .from('tasks')

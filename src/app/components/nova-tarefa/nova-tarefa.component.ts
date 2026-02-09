@@ -1,5 +1,5 @@
-import { Component, OnInit, Input } from '@angular/core';
-import { ModalController } from '@ionic/angular';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+// remove o ModalController
 import { TasksService } from '../../services/tasks.service';
 import { Task } from '../../services/task';
 import { CategoriesService } from '../../services/categories.service';
@@ -18,15 +18,16 @@ interface ProjetoOption {
   standalone: false
 })
 export class NovaTarefaComponent implements OnInit {
-  @Input() projeto?: number;      // se vier de detalhes-projeto
-  @Input() categoria?: any;       // não vamos usar aqui por enquanto
+  @Input() projeto?: number;
+  @Input() categoria?: any;
+
+  @Output() fecharModal = new EventEmitter<Task | null>();
 
   titulo = '';
   descricao = '';
   dataLimite?: string;
   imagemUrl?: string;
 
-  // selects
   categorias: Category[] = [];
   categoriaSelecionadaId?: number;
 
@@ -34,20 +35,16 @@ export class NovaTarefaComponent implements OnInit {
   projetoSelecionadoId?: number;
 
   constructor(
-    private modalCtrl: ModalController,
     private tasksService: TasksService,
     private categoriesService: CategoriesService,
     private projectsService: ProjectsService
   ) {}
 
   async ngOnInit() {
-    // 1) carregar categorias da BD
     this.categorias = await this.categoriesService.getAllCategories();
 
-    // 2) se vier de detalhes-projeto, já tens o projeto fixo
     if (this.projeto) {
       this.projetoSelecionadoId = this.projeto;
-      // se quiseres, também podias preencher categoriaSelecionadaId aqui com base no projeto
     }
   }
 
@@ -104,12 +101,11 @@ export class NovaTarefaComponent implements OnInit {
 
     const criada = await this.tasksService.insertTask(novaTask);
 
-    if (criada) {
-      await this.modalCtrl.dismiss(criada);
-    }
+    // avisa o pai (home / detalhes-projeto)
+    this.fecharModal.emit(criada ?? null);
   }
 
   fechar() {
-    this.modalCtrl.dismiss();
+    this.fecharModal.emit(null);
   }
 }

@@ -25,7 +25,9 @@
       [initialBreakpoint]="1"
     >
       <ng-template>
-        <app-nova-tarefa></app-nova-tarefa>
+        <app-nova-tarefa
+          (fecharModal)="onNovaTarefaFechar($event)">
+        </app-nova-tarefa>
       </ng-template>
     </ion-modal>
   </ion-item>

@@ -3,16 +3,8 @@ import { Router } from '@angular/router';
 import { Tarefa } from '../components/cartoes-tarefas/cartoes-tarefas.component';
 import { TasksService } from '../services/tasks.service';
 import { Task } from '../services/task';
-import { ProjectsService, Project } from '../services/projects.service';
 
 type FiltroTarefas = 'hoje' | 'proximas' | 'concluidas' | 'atrasadas';
-
-interface ProjetoOption {
-  id: number;
-  nome: string;
-}
-
-const HOME_CATEGORY_ID = 1; // <-- troca para o category_id que queres usar na home
 
 @Component({
   selector: 'app-home',
@@ -25,25 +17,14 @@ export class HomePage {
   isModalAberto = false;
 
   tarefas: Tarefa[] = [];
-  projetos: ProjetoOption[] = [];
 
   constructor(
     private router: Router,
-    private tasksService: TasksService,
-    private projectsService: ProjectsService
+    private tasksService: TasksService
   ) {}
 
   async ionViewWillEnter() {
-    await this.carregarProjetos();
     await this.carregarTarefas();
-  }
-
-  private async carregarProjetos() {
-    const data: Project[] = await this.projectsService.getProjectsByCategory(HOME_CATEGORY_ID);
-    this.projetos = data.map(p => ({
-      id: p.id ?? 0,
-      nome: p.name
-    }));
   }
 
   private mapTaskToTarefa(task: Task, todayStr: string): Tarefa {
@@ -88,7 +69,7 @@ export class HomePage {
     return {
       id: task.id || 0,
       titulo: task.title,
-      projeto: 'PROJETO',
+      projeto: 'PROJETO', // depois podemos trocar pelo nome real
       descricao: task.description || '',
       dataLimite: dataLegivel,
       estado,
@@ -103,17 +84,27 @@ export class HomePage {
     const dd = String(hoje.getDate()).padStart(2, '0');
     const todayStr = `${yyyy}-${mm}-${dd}`;
 
-    // mantém por agora projectId 1 como origem da lista da home
-    const tasks: Task[] = await this.tasksService.getTasksByProject(1);
+    // TODAS as tarefas da BD
+    const tasks: Task[] = await this.tasksService.getAllTasks();
 
     this.tarefas = tasks.map(t => this.mapTaskToTarefa(t, todayStr));
   }
 
   async onModalDismiss(ev: any) {
+  // este continua por segurança, se fechares pelo backdrop
     this.isModalAberto = false;
 
     const data = ev?.detail?.data;
     if (data) {
+      await this.carregarTarefas();
+    }
+  }
+
+  // chamado pelo componente, fecha o modal e recarrega
+  async onNovaTarefaFechar(task: Task | null) {
+    this.isModalAberto = false;
+
+    if (task) {
       await this.carregarTarefas();
     }
   }
