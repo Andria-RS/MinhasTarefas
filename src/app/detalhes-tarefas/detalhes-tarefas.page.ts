@@ -3,19 +3,23 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { OpcoesService } from '../services/opcoes';
 import { TasksService } from '../services/tasks.service';
 import { Task } from '../services/task';
+import { ProjectsService } from '../services/projects.service';
+import { CategoriesService } from '../services/categories.service';
+import { Category } from '../services/category';
 
 type EstadoTarefa = 'por-fazer' | 'feito' | 'atrasada';
 
 interface DetalheTarefa {
   id: number;
   titulo: string;
-  projeto: string;      // project_id em string para o select
+  projetoId: number;      // id real do projeto
+  projetoNome: string;    // nome para mostrar
   descricao: string;
-  dataLimite: string;   // ISO completo usado no ion-datetime
-  dataData: string;     // texto formatado pt-PT
-  dataHora: string;     // texto HH:mm
+  dataLimite: string;     // ISO completo usado no ion-datetime
+  dataData: string;       // texto formatado pt-PT
+  dataHora: string;       // texto HH:mm
   estado: EstadoTarefa;
-  categoria: string;
+  categoria: string;      // nome da categoria real
   imagemUrl: string;
 }
 
@@ -33,22 +37,16 @@ export class DetalhesTarefasPage implements OnInit {
   isModalEditarAberto = false;
   tarefaEditavel!: DetalheTarefa;
 
-  projetos = [
-    { id: '1', nome: 'Estudar PMEU' },
-    { id: '2', nome: 'Trabalho X' }
-  ];
-
-  categorias = [
-    { id: 'escola', nome: 'escola' },
-    { id: 'trabalho', nome: 'trabalho' },
-    { id: 'pessoal', nome: 'pessoal' }
-  ];
+  // projetos da mesma categoria, para o select do modal
+  projetos: { id: number; nome: string }[] = [];
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private opcoesService: OpcoesService,
-    private tasksService: TasksService
+    private tasksService: TasksService,
+    private projectsService: ProjectsService,
+    private categoriesService: CategoriesService
   ) {}
 
   async ngOnInit() {
@@ -56,7 +54,6 @@ export class DetalhesTarefasPage implements OnInit {
     this.tarefaId = idParam ? +idParam : 0;
 
     if (!this.tarefaId) {
-      // se não houver id válido, volta para home
       this.router.navigate(['/home']);
       return;
     }
@@ -66,8 +63,8 @@ export class DetalhesTarefasPage implements OnInit {
 
   // --- Helpers de mapeamento entre Task (BD) e DetalheTarefa (UI) ---
 
-  private mapTaskToDetalhe(task: Task): DetalheTarefa {
-    // construir uma data ISO para o ion-datetime (data + hora)
+  private async mapTaskToDetalhe(task: Task): Promise<DetalheTarefa> {
+    // data/hora
     let isoDataLimite = '';
     let dataFormatada = '';
     let horaFormatada = '';
@@ -85,25 +82,53 @@ export class DetalhesTarefasPage implements OnInit {
       });
     }
 
-    // estado: por agora usamos 'por-fazer' / 'feito' conforme completed
+    // estado
     const estado: EstadoTarefa = task.completed ? 'feito' : 'por-fazer';
+
+    // projeto + categoria reais
+    let categoriaNome = 'Sem categoria';
+    let projetoNome = 'Sem projeto';
+    let projetoId = task.project_id ?? 0;
+
+    if (task.project_id) {
+      const project = await this.projectsService.getProjectById(task.project_id);
+      if (project) {
+        projetoNome = project.name;
+        projetoId = project.id ?? task.project_id;
+
+        if (project.category_id) {
+          const categoria: Category | null =
+            await this.categoriesService.getCategoryById(project.category_id);
+          if (categoria) {
+            categoriaNome = categoria.name;
+          }
+
+          // carregar projetos da mesma categoria para o select
+          const projetosMesmaCategoria = await this.projectsService.getProjectsByCategory(project.category_id);
+          this.projetos = projetosMesmaCategoria.map(p => ({
+            id: p.id ?? 0,
+            nome: p.name
+          }));
+        }
+      }
+    }
 
     return {
       id: task.id || 0,
       titulo: task.title,
-      projeto: String(task.project_id),
+      projetoId,
+      projetoNome,
       descricao: task.description || '',
       dataLimite: isoDataLimite,
       dataData: dataFormatada,
       dataHora: horaFormatada,
       estado,
-      categoria: 'escola', // por enquanto sem BD de categorias ligada
+      categoria: categoriaNome,
       imagemUrl: task.image_url || 'assets/imagens/tarefas/estudar.jpg'
     };
   }
 
   private mapDetalheToTask(det: DetalheTarefa): Task {
-    // extrair date e time separados a partir do ISO do ion-datetime
     let due_date = '';
     let due_time: string | undefined = undefined;
 
@@ -123,7 +148,7 @@ export class DetalhesTarefasPage implements OnInit {
 
     return {
       id: det.id,
-      project_id: Number(det.projeto),
+      project_id: det.projetoId,
       title: det.titulo,
       description: det.descricao,
       due_date,
@@ -141,7 +166,7 @@ export class DetalhesTarefasPage implements OnInit {
       this.router.navigate(['/home']);
       return;
     }
-    this.tarefa = this.mapTaskToDetalhe(task);
+    this.tarefa = await this.mapTaskToDetalhe(task);
   }
 
   // --- Opções / Editar / Eliminar ---

@@ -20,16 +20,18 @@
 
 <ion-content [fullscreen]="true" *ngIf="tarefa">
 
-  <!-- Detalhes (mantidos como tinhas) -->
+  <!-- Imagem da tarefa -->
   <ion-card class="tarefa-img-card">
     <ion-img [src]="tarefa.imagemUrl" alt="Imagem da tarefa"></ion-img>
   </ion-card>
 
+  <!-- Título -->
   <ion-item lines="full">
     <ion-label position="stacked">Título</ion-label>
     <ion-input [(ngModel)]="tarefa.titulo" readonly="true"></ion-input>
   </ion-item>
 
+  <!-- Data / Hora -->
   <ion-grid>
     <ion-row>
       <ion-col size="7">
@@ -47,6 +49,7 @@
     </ion-row>
   </ion-grid>
 
+  <!-- Descrição -->
   <ion-item lines="full">
     <ion-label position="stacked">Descrição</ion-label>
     <ion-textarea
@@ -56,6 +59,7 @@
     </ion-textarea>
   </ion-item>
 
+  <!-- Categoria (nome real) -->
   <ion-item lines="full">
     <ion-label position="stacked">Categoria</ion-label>
     <ion-select [value]="tarefa.categoria" interface="popover" disabled="true">
@@ -65,6 +69,13 @@
     </ion-select>
   </ion-item>
 
+  <!-- Projeto (nome) -->
+  <ion-item lines="full">
+    <ion-label position="stacked">Projeto</ion-label>
+    <ion-input [value]="tarefa.projetoNome" readonly="true"></ion-input>
+  </ion-item>
+
+  <!-- Estado -->
   <ion-item lines="full">
     <ion-label position="stacked">Estado</ion-label>
     <ion-select [value]="tarefa.estado" interface="popover" disabled="true">
@@ -74,7 +85,7 @@
     </ion-select>
   </ion-item>
 
-  <!-- SHEET EDITAR TAREFA – estilos e classes próprias -->
+  <!-- SHEET EDITAR TAREFA -->
   <ion-modal
     [isOpen]="isModalEditarAberto"
     (didDismiss)="fecharEditarTarefa()"
@@ -120,19 +131,7 @@
           </ion-input>
         </ion-item>
 
-        <!-- Projeto -->
-        <ion-item lines="full">
-          <ion-label position="stacked">Projeto</ion-label>
-          <ion-select
-            placeholder="Selecionar projeto"
-            [(ngModel)]="tarefaEditavel.projeto">
-            <ion-select-option *ngFor="let p of projetos" [value]="p.id">
-              {{ p.nome }}
-            </ion-select-option>
-          </ion-select>
-        </ion-item>
-
-        <!-- Data e Hora (com popover próprio) -->
+        <!-- Data e Hora -->
         <ion-item lines="full">
           <ion-label position="stacked">Data</ion-label>
           <ion-datetime-button datetime="dt-editar-tarefa"></ion-datetime-button>
@@ -158,14 +157,14 @@
           </ion-textarea>
         </ion-item>
 
-        <!-- Categoria -->
+        <!-- Projeto (id) -->
         <ion-item lines="full">
-          <ion-label position="stacked">Categoria</ion-label>
+          <ion-label position="stacked">Projeto</ion-label>
           <ion-select
-            placeholder="Selecionar categoria"
-            [(ngModel)]="tarefaEditavel.categoria">
-            <ion-select-option *ngFor="let c of categorias" [value]="c.id">
-              {{ c.nome }}
+            placeholder="Selecionar projeto"
+            [(ngModel)]="tarefaEditavel.projetoId">
+            <ion-select-option *ngFor="let p of projetos" [value]="p.id">
+              {{ p.nome }}
             </ion-select-option>
           </ion-select>
         </ion-item>
@@ -176,7 +175,6 @@
           <ion-select [(ngModel)]="tarefaEditavel.estado">
             <ion-select-option value="por-fazer">Por fazer</ion-select-option>
             <ion-select-option value="feito">Feito</ion-select-option>
-            <ion-select-option value="atrasada">Atrasada</ion-select-option>
           </ion-select>
         </ion-item>
 

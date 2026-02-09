@@ -4,7 +4,7 @@ import { Tarefa } from '../components/cartoes-tarefas/cartoes-tarefas.component'
 import { TasksService } from '../services/tasks.service';
 import { Task } from '../services/task';
 
-type FiltroTarefas = 'hoje' | 'proximas' | 'atrasadas';
+type FiltroTarefas = 'hoje' | 'proximas' | 'concluidas' | 'atrasadas';
 
 @Component({
   selector: 'app-home',
@@ -33,8 +33,8 @@ export class HomePage {
     let deadline: Date | null = null;
 
     if (task.due_date) {
-      const base = task.due_date;                  // 'YYYY-MM-DD'
-      const time = task.due_time || '00:00:00';    // 'HH:MM:SS'
+      const base = task.due_date;                 // 'YYYY-MM-DD'
+      const time = task.due_time || '00:00:00';   // 'HH:MM:SS'
       const iso = `${base}T${time}`;
       const d = new Date(iso);
       deadline = d;
@@ -57,9 +57,11 @@ export class HomePage {
       estado = 'por-fazer';
     }
 
-    // tipo (para os segmentos, só pela data)
-    let tipo: 'hoje' | 'proximas' | 'atrasadas';
-    if (task.due_date === todayStr) {
+    // tipo (para os segmentos)
+    let tipo: 'hoje' | 'proximas' | 'concluidas' | 'atrasadas';
+    if (task.completed) {
+      tipo = 'concluidas';
+    } else if (task.due_date === todayStr) {
       tipo = 'hoje';
     } else if (task.due_date < todayStr) {
       tipo = 'atrasadas';

@@ -57,8 +57,8 @@
         <!-- modal igual ao da home, mas já com categoria e projeto -->
         <app-nova-tarefa
           *ngIf="projeto"
-          [categoria]="projeto.categoria"
-          [projeto]="projeto.nome">
+          [projeto]="projeto.id"
+          [categoria]="projeto.categoria">
         </app-nova-tarefa>
       </ng-template>
     </ion-modal>

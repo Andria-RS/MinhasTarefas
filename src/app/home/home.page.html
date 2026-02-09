@@ -31,25 +31,25 @@
   </ion-item>
 
   <ion-segment [(ngModel)]="filtro">
-  <ion-segment-button value="hoje">
-    <ion-label>Hoje</ion-label>
-  </ion-segment-button>
-  <ion-segment-button value="proximas">
-    <ion-label>Próximas</ion-label>
-  </ion-segment-button>
-  <ion-segment-button value="atrasadas">
-    <ion-label>Atrasadas</ion-label>
-  </ion-segment-button>
-</ion-segment>
+    <ion-segment-button value="hoje">
+      <ion-label>Hoje</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="proximas">
+      <ion-label>Próximas</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="concluidas">
+      <ion-label>Concluídas</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="atrasadas">
+      <ion-label>Atrasadas</ion-label>
+    </ion-segment-button>
+  </ion-segment>
 
-<ng-container *ngFor="let tarefa of tarefas">
-  <app-cartoes-tarefas
-    *ngIf="tarefa.tipo === filtro"
-    [tarefa]="tarefa"
-    (abrirDetalhes)="abrirDetalhesTarefas($event)">
-  </app-cartoes-tarefas>
-</ng-container>
-
-
-
+  <ng-container *ngFor="let tarefa of tarefas">
+    <app-cartoes-tarefas
+      *ngIf="tarefa.tipo === filtro"
+      [tarefa]="tarefa"
+      (abrirDetalhes)="abrirDetalhesTarefas($event)">
+    </app-cartoes-tarefas>
+  </ng-container>
 </ion-content>
