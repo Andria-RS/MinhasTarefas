@@ -19,7 +19,7 @@
 
     <ion-modal
       [isOpen]="isModalAberto"
-      (didDismiss)="isModalAberto = false"
+      (didDismiss)="onModalDismiss($event)"
       class="sheet-modal"
       [breakpoints]="[0, 1]"
       [initialBreakpoint]="1"

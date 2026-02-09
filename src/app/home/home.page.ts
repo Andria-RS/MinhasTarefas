@@ -3,8 +3,16 @@ import { Router } from '@angular/router';
 import { Tarefa } from '../components/cartoes-tarefas/cartoes-tarefas.component';
 import { TasksService } from '../services/tasks.service';
 import { Task } from '../services/task';
+import { ProjectsService, Project } from '../services/projects.service';
 
 type FiltroTarefas = 'hoje' | 'proximas' | 'concluidas' | 'atrasadas';
+
+interface ProjetoOption {
+  id: number;
+  nome: string;
+}
+
+const HOME_CATEGORY_ID = 1; // <-- troca para o category_id que queres usar na home
 
 @Component({
   selector: 'app-home',
@@ -17,24 +25,34 @@ export class HomePage {
   isModalAberto = false;
 
   tarefas: Tarefa[] = [];
+  projetos: ProjetoOption[] = [];
 
   constructor(
     private router: Router,
-    private tasksService: TasksService
+    private tasksService: TasksService,
+    private projectsService: ProjectsService
   ) {}
 
   async ionViewWillEnter() {
+    await this.carregarProjetos();
     await this.carregarTarefas();
   }
 
+  private async carregarProjetos() {
+    const data: Project[] = await this.projectsService.getProjectsByCategory(HOME_CATEGORY_ID);
+    this.projetos = data.map(p => ({
+      id: p.id ?? 0,
+      nome: p.name
+    }));
+  }
+
   private mapTaskToTarefa(task: Task, todayStr: string): Tarefa {
-    // data/hora legível
     let dataLegivel = '';
     let deadline: Date | null = null;
 
     if (task.due_date) {
-      const base = task.due_date;                 // 'YYYY-MM-DD'
-      const time = task.due_time || '00:00:00';   // 'HH:MM:SS'
+      const base = task.due_date;
+      const time = task.due_time || '00:00:00';
       const iso = `${base}T${time}`;
       const d = new Date(iso);
       deadline = d;
@@ -47,7 +65,6 @@ export class HomePage {
 
     const now = new Date();
 
-    // estado (considera data + hora)
     let estado: 'por-fazer' | 'feito' | 'atrasada';
     if (task.completed) {
       estado = 'feito';
@@ -57,7 +74,6 @@ export class HomePage {
       estado = 'por-fazer';
     }
 
-    // tipo (para os segmentos)
     let tipo: 'hoje' | 'proximas' | 'concluidas' | 'atrasadas';
     if (task.completed) {
       tipo = 'concluidas';
@@ -72,7 +88,7 @@ export class HomePage {
     return {
       id: task.id || 0,
       titulo: task.title,
-      projeto: 'PROJETO', // mais tarde ligamos à tabela projects
+      projeto: 'PROJETO',
       descricao: task.description || '',
       dataLimite: dataLegivel,
       estado,
@@ -87,10 +103,19 @@ export class HomePage {
     const dd = String(hoje.getDate()).padStart(2, '0');
     const todayStr = `${yyyy}-${mm}-${dd}`;
 
-    // por agora: tarefas de um projeto fixo (ajusta quando tiveres projects ligados)
+    // mantém por agora projectId 1 como origem da lista da home
     const tasks: Task[] = await this.tasksService.getTasksByProject(1);
 
     this.tarefas = tasks.map(t => this.mapTaskToTarefa(t, todayStr));
+  }
+
+  async onModalDismiss(ev: any) {
+    this.isModalAberto = false;
+
+    const data = ev?.detail?.data;
+    if (data) {
+      await this.carregarTarefas();
+    }
   }
 
   irPaginaTarefas() {

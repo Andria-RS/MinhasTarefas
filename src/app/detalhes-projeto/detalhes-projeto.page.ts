@@ -241,4 +241,14 @@ export class DetalhesProjetoPage implements OnInit {
   abrirDetalhesTarefas(tarefa: Tarefa) {
     this.router.navigate(['/detalhes-tarefas', tarefa.id]);
   }
+
+  // handler do didDismiss do modal de nova tarefa
+  async onModalNovaTarefaDismiss(ev: any) {
+    this.isModalAberto = false;
+
+    const data = ev?.detail?.data;
+    if (data && this.projeto) {
+      await this.carregarTarefasDoProjeto(this.projeto.id, this.projeto.nome);
+    }
+  }
 }

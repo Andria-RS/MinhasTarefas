@@ -48,13 +48,12 @@
 
     <ion-modal
       [isOpen]="isModalAberto"
-      (didDismiss)="isModalAberto = false"
+      (didDismiss)="onModalNovaTarefaDismiss($event)"
       class="sheet-modal"
       [breakpoints]="[0, 1]"
       [initialBreakpoint]="1"
     >
       <ng-template>
-        <!-- modal igual ao da home, mas já com categoria e projeto -->
         <app-nova-tarefa
           *ngIf="projeto"
           [projeto]="projeto.id"
