@@ -198,7 +198,7 @@ export class CalendarPage implements OnInit {
   }
 
   abrirDetalhesTarefa(tarefa: Tarefa) {
-    this.router.navigate(['/detalhes-tarefa', tarefa.id]);
+    this.router.navigate(['/detalhes-tarefas', tarefa.id]);
   }
 
   // ✅ ADICIONA ESTE MÉTODO AQUI NO FINAL

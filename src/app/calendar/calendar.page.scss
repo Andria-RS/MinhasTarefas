@@ -44,3 +44,51 @@ ion-datetime {
 }
 
 
+// ========================================
+// HEADER DO DIA (parte de cima)
+// ========================================
+.tasks-wrapper .day-header {
+  margin-bottom: 16px;
+  padding: 0 8px 12px 8px;
+  border-bottom: 1px solid rgba(var(--ion-color-light-rgb), 0.3);
+
+  h2 {
+    font-size: 22px;
+    font-weight: 700;
+    margin: 0 0 4px 0;
+    color: var(--ion-color-dark);
+    text-transform: capitalize;
+  }
+
+  .task-count {
+    font-size: 14px;
+    color: var(--ion-color-medium);
+    margin: 0;
+  }
+}
+
+// ========================================
+// EMPTY STATE (quando não há tarefas)
+// ========================================
+.tasks-wrapper .empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 24px;
+  text-align: center;
+  margin-top: 24px;
+
+  ion-icon {
+    font-size: 72px;
+    color: var(--ion-color-medium);
+    opacity: 0.3;
+    margin-bottom: 16px;
+  }
+
+  p {
+    font-size: 15px;
+    color: var(--ion-color-medium);
+    margin: 0;
+  }
+}
