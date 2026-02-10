@@ -1,9 +1,11 @@
-import { Component } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, OnDestroy } from '@angular/core';
+import { Router, NavigationEnd } from '@angular/router';
 import { Tarefa } from '../components/cartoes-tarefas/cartoes-tarefas.component';
 import { TasksService } from '../services/tasks.service';
 import { Task } from '../services/task';
 import { ProjectsService, Project } from '../services/projects.service';
+import { Subscription } from 'rxjs';
+import { filter } from 'rxjs/operators';
 
 type FiltroTarefas = 'hoje' | 'proximas' | 'concluidas' | 'atrasadas';
 
@@ -13,22 +15,37 @@ type FiltroTarefas = 'hoje' | 'proximas' | 'concluidas' | 'atrasadas';
   styleUrls: ['home.page.scss'],
   standalone: false,
 })
-export class HomePage {
+export class HomePage implements OnDestroy {
   filtro: FiltroTarefas = 'hoje';
   isModalAberto = false;
 
   tarefas: Tarefa[] = [];
 
-  // project_id -> nome do projeto
   private nomesProjetos = new Map<number, string>();
+  private routerSub?: Subscription;
 
   constructor(
     private router: Router,
     private tasksService: TasksService,
     private projectsService: ProjectsService
-  ) {}
+  ) {
+    // escuta navegação para esta página e recarrega sempre
+    this.routerSub = this.router.events
+      .pipe(filter(event => event instanceof NavigationEnd))
+      .subscribe((event: any) => {
+        if (event.url.includes('/tabs/home')) {
+          console.log('🔄 Home: rota mudou, a recarregar...');
+          this.carregarProjetos().then(() => this.carregarTarefas());
+        }
+      });
+  }
+
+  ngOnDestroy() {
+    this.routerSub?.unsubscribe();
+  }
 
   async ionViewWillEnter() {
+    console.log('🔄 Home: ionViewWillEnter');
     await this.carregarProjetos();
     await this.carregarTarefas();
   }
@@ -91,7 +108,7 @@ export class HomePage {
     return {
       id: task.id || 0,
       titulo: task.title,
-      projeto: nomeProjeto, // ← AQUI aparece o nome real no card
+      projeto: nomeProjeto,
       descricao: task.description || '',
       dataLimite: dataLegivel,
       estado,
@@ -109,6 +126,7 @@ export class HomePage {
     const tasks: Task[] = await this.tasksService.getAllTasks();
 
     this.tarefas = tasks.map(t => this.mapTaskToTarefa(t, todayStr));
+    console.log('✅ Home: carregadas', this.tarefas.length, 'tarefas');
   }
 
   async onModalDismiss(ev: any) {
@@ -124,6 +142,7 @@ export class HomePage {
   async onNovaTarefaFechar(task: Task | null) {
     this.isModalAberto = false;
 
+    console.log('📝 Home: modal fechou, task?', task ? task.id : 'null');
     if (task) {
       await this.carregarProjetos();
       await this.carregarTarefas();

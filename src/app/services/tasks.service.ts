@@ -24,7 +24,6 @@ export class TasksService {
       console.error(error);
       return [];
     }
-
     return data as Task[];
   }
 
@@ -39,7 +38,6 @@ export class TasksService {
       console.error(error);
       return [];
     }
-
     return data as Task[];
   }
 
@@ -54,7 +52,6 @@ export class TasksService {
       console.error(error);
       return null;
     }
-
     return data as Task;
   }
 
@@ -70,13 +67,13 @@ export class TasksService {
         image_url: task.image_url,
         completed: task.completed
       })
+      .select()  // ← IMPORTANTE: traz o registo inserido
       .single();
 
     if (error) {
       console.error(error);
       return null;
     }
-
     return data as Task;
   }
 
@@ -124,7 +121,6 @@ export class TasksService {
       console.error(error);
       return [];
     }
-
     return data as Task[];
   }
 }

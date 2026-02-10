@@ -12,14 +12,14 @@ type EstadoTarefa = 'por-fazer' | 'feito' | 'atrasada';
 interface DetalheTarefa {
   id: number;
   titulo: string;
-  projetoId: number;      // id real do projeto
-  projetoNome: string;    // nome para mostrar
+  projetoId: number;
+  projetoNome: string;
   descricao: string;
-  dataLimite: string;     // ISO completo usado no ion-datetime
-  dataData: string;       // texto formatado pt-PT
-  dataHora: string;       // texto HH:mm
+  dataLimite: string;
+  dataData: string;
+  dataHora: string;
   estado: EstadoTarefa;
-  categoria: string;      // nome da categoria real
+  categoria: string;
   imagemUrl: string;
 }
 
@@ -30,14 +30,12 @@ interface DetalheTarefa {
   standalone: false
 })
 export class DetalhesTarefasPage implements OnInit {
-
   tarefaId!: number;
   tarefa!: DetalheTarefa;
 
   isModalEditarAberto = false;
   tarefaEditavel!: DetalheTarefa;
 
-  // projetos da mesma categoria, para o select do modal
   projetos: { id: number; nome: string }[] = [];
 
   constructor(
@@ -54,27 +52,24 @@ export class DetalhesTarefasPage implements OnInit {
     this.tarefaId = idParam ? +idParam : 0;
 
     if (!this.tarefaId) {
-      this.router.navigate(['/home']);
+      this.router.navigate(['/tabs/home'], { replaceUrl: true });
       return;
     }
 
     await this.carregarTarefa();
   }
 
-  // --- Helpers de mapeamento entre Task (BD) e DetalheTarefa (UI) ---
-
   private async mapTaskToDetalhe(task: Task): Promise<DetalheTarefa> {
-    // data/hora
     let isoDataLimite = '';
     let dataFormatada = '';
     let horaFormatada = '';
 
     if (task.due_date) {
-      const base = task.due_date;                 // 'YYYY-MM-DD'
-      const time = task.due_time || '00:00:00';   // 'HH:MM:SS'
+      const base = task.due_date;
+      const time = task.due_time || '00:00:00';
       isoDataLimite = `${base}T${time}`;
-
       const d = new Date(isoDataLimite);
+
       dataFormatada = d.toLocaleDateString('pt-PT');
       horaFormatada = d.toLocaleTimeString('pt-PT', {
         hour: '2-digit',
@@ -82,10 +77,8 @@ export class DetalhesTarefasPage implements OnInit {
       });
     }
 
-    // estado
     const estado: EstadoTarefa = task.completed ? 'feito' : 'por-fazer';
 
-    // projeto + categoria reais
     let categoriaNome = 'Sem categoria';
     let projetoNome = 'Sem projeto';
     let projetoId = task.project_id ?? 0;
@@ -103,7 +96,6 @@ export class DetalhesTarefasPage implements OnInit {
             categoriaNome = categoria.name;
           }
 
-          // carregar projetos da mesma categoria para o select
           const projetosMesmaCategoria = await this.projectsService.getProjectsByCategory(project.category_id);
           this.projetos = projetosMesmaCategoria.map(p => ({
             id: p.id ?? 0,
@@ -158,18 +150,14 @@ export class DetalhesTarefasPage implements OnInit {
     };
   }
 
-  // --- Carregar tarefa do Supabase ---
-
   async carregarTarefa() {
     const task = await this.tasksService.getTaskById(this.tarefaId);
     if (!task) {
-      this.router.navigate(['/home']);
+      this.router.navigate(['/tabs/home'], { replaceUrl: true });
       return;
     }
     this.tarefa = await this.mapTaskToDetalhe(task);
   }
-
-  // --- Opções / Editar / Eliminar ---
 
   abrirOpcoesTarefa() {
     this.opcoesService.abrirEditarEliminar(
@@ -177,8 +165,14 @@ export class DetalhesTarefasPage implements OnInit {
       this.tarefa.titulo,
       () => this.abrirEditarTarefa(),
       async () => {
+        console.log('🗑️ A apagar tarefa', this.tarefaId);
         await this.tasksService.deleteTask(this.tarefaId);
-        this.router.navigate(['/home']);
+        
+        console.log('⬅️ A voltar para home e recarregar...');
+        // navega e força recarga com replaceUrl + queryParams temporário
+        this.router.navigate(['/tabs/home'], { 
+          queryParams: { _reload: Date.now() }
+        });
       }
     );
   }
@@ -193,7 +187,6 @@ export class DetalhesTarefasPage implements OnInit {
   }
 
   async guardarEditarTarefa() {
-    // atualizar campos de data/hora formatados
     if (this.tarefaEditavel.dataLimite) {
       const d = new Date(this.tarefaEditavel.dataLimite);
       this.tarefaEditavel.dataData = d.toLocaleDateString('pt-PT');
@@ -203,11 +196,9 @@ export class DetalhesTarefasPage implements OnInit {
       });
     }
 
-    // mapear para Task e enviar para Supabase
     const taskToUpdate = this.mapDetalheToTask(this.tarefaEditavel);
     await this.tasksService.updateTask(taskToUpdate);
 
-    // atualizar tarefa em memória e fechar modal
     this.tarefa = { ...this.tarefaEditavel };
     this.fecharEditarTarefa();
   }
