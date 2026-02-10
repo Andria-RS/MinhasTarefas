@@ -38,6 +38,10 @@ export class DetalhesTarefasPage implements OnInit {
 
   projetos: { id: number; nome: string }[] = [];
 
+  // guarda de onde veio
+  private origemNavegacao: string = '';
+  private origemProjectId?: number;
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
@@ -55,6 +59,13 @@ export class DetalhesTarefasPage implements OnInit {
       this.router.navigate(['/tabs/home'], { replaceUrl: true });
       return;
     }
+
+    // captura de onde veio
+    this.origemNavegacao = this.route.snapshot.queryParamMap.get('from') || '';
+    const projId = this.route.snapshot.queryParamMap.get('projectId');
+    this.origemProjectId = projId ? +projId : undefined;
+
+    console.log('🔍 Detalhes-Tarefas: origem =', this.origemNavegacao, 'projectId =', this.origemProjectId);
 
     await this.carregarTarefa();
   }
@@ -168,11 +179,21 @@ export class DetalhesTarefasPage implements OnInit {
         console.log('🗑️ A apagar tarefa', this.tarefaId);
         await this.tasksService.deleteTask(this.tarefaId);
         
-        console.log('⬅️ A voltar para home e recarregar...');
-        // navega e força recarga com replaceUrl + queryParams temporário
-        this.router.navigate(['/tabs/home'], { 
-          queryParams: { _reload: Date.now() }
-        });
+        console.log('⬅️ A voltar para origem:', this.origemNavegacao);
+        
+        // volta para onde veio
+        if (this.origemNavegacao === 'project' && this.origemProjectId) {
+          console.log('   → detalhes-projeto', this.origemProjectId);
+          this.router.navigate(['/detalhes-projeto', this.origemProjectId], { 
+            queryParams: { _reload: Date.now() }
+          });
+        } else {
+          // default: volta para home (inclui quando veio de 'home' ou sem origem)
+          console.log('   → home');
+          this.router.navigate(['/tabs/home'], { 
+            queryParams: { _reload: Date.now() }
+          });
+        }
       }
     );
   }

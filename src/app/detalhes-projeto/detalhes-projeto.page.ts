@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
 import { Tarefa } from '../components/cartoes-tarefas/cartoes-tarefas.component';
 import { OpcoesService } from '../services/opcoes';
 import { ProjectsService, Project } from '../services/projects.service';
@@ -7,6 +7,8 @@ import { CategoriesService } from '../services/categories.service';
 import { Category } from '../services/category';
 import { TasksService } from '../services/tasks.service';
 import { Task } from '../services/task';
+import { Subscription } from 'rxjs';
+import { filter } from 'rxjs/operators';
 
 type EstadoProjeto = 'por-fazer' | 'feito';
 type EstadoTarefa = 'por-fazer' | 'feito' | 'atrasada';
@@ -16,8 +18,8 @@ interface ProjetoFront {
   nome: string;
   descricao: string;
   estado: EstadoProjeto;
-  categoria: string;    // nome real
-  categoriaId: number;  // id real da BD
+  categoria: string;
+  categoriaId: number;
 }
 
 @Component({
@@ -26,23 +28,19 @@ interface ProjetoFront {
   styleUrls: ['./detalhes-projeto.page.scss'],
   standalone: false
 })
-export class DetalhesProjetoPage implements OnInit {
-
-  // sheet "Nova tarefa" deste projeto
+export class DetalhesProjetoPage implements OnInit, OnDestroy {
   isModalAberto = false;
-
-  // dados do projeto mostrado na página (vêm da BD)
+  
   projeto!: ProjetoFront;
-
-  // tarefas do projeto (vêm da BD)
   tarefas: Tarefa[] = [];
 
-  // -------- SHEET EDITAR PROJETO --------
   isModalEditarProjetoAberto = false;
   projetoEditavel!: ProjetoFront;
 
-  // categorias reais da BD
   categorias: Category[] = [];
+
+  private routerSub?: Subscription;
+  private projectId: number = 0;
 
   constructor(
     private opcoesService: OpcoesService,
@@ -51,32 +49,49 @@ export class DetalhesProjetoPage implements OnInit {
     private projectsService: ProjectsService,
     private categoriesService: CategoriesService,
     private tasksService: TasksService
-  ) {}
+  ) {
+    // escuta mudanças na rota para recarregar quando voltar de detalhes-tarefas
+    this.routerSub = this.router.events
+      .pipe(filter(event => event instanceof NavigationEnd))
+      .subscribe((event: any) => {
+        if (event.url.includes('/detalhes-projeto/') && event.url.includes('_reload') && this.projectId) {
+          console.log('🔄 Detalhes-Projeto: detectou _reload, a recarregar...');
+          this.carregarProjeto(this.projectId).then(() => 
+            this.carregarTarefasDoProjeto(this.projeto.id, this.projeto.nome)
+          );
+        }
+      });
+  }
+
+  ngOnDestroy() {
+    this.routerSub?.unsubscribe();
+  }
 
   async ngOnInit() {
     const param = this.route.snapshot.paramMap.get('id');
     console.log('detalhes-projeto param id =', param);
+    this.projectId = param ? Number(param) : 0;
+    console.log('detalhes-projeto projectId =', this.projectId);
 
-    const projectId = param ? Number(param) : 0;
-    console.log('detalhes-projeto projectId =', projectId);
-
-    if (!projectId) {
+    if (!this.projectId) {
       this.router.navigate(['/tabs/home']);
       return;
     }
 
-    // 1) Carrega o projeto (com categoriaId)
-    await this.carregarProjeto(projectId);
-
-    // 2) Carrega as tarefas reais deste projeto
+    await this.carregarProjeto(this.projectId);
     await this.carregarTarefasDoProjeto(this.projeto.id, this.projeto.nome);
 
-    // 3) Só depois carrega as categorias
     this.categorias = await this.categoriesService.getAllCategories();
     console.log('categorias =', this.categorias);
   }
 
-  // --------- MAP BD → FRONT (PROJETO) ---------
+  async ionViewWillEnter() {
+    console.log('🔄 Detalhes-Projeto: ionViewWillEnter');
+    if (this.projectId) {
+      await this.carregarProjeto(this.projectId);
+      await this.carregarTarefasDoProjeto(this.projeto.id, this.projeto.nome);
+    }
+  }
 
   private mapProjectToFront(p: Project): ProjetoFront {
     return {
@@ -84,7 +99,7 @@ export class DetalhesProjetoPage implements OnInit {
       nome: p.name,
       descricao: p.description || '',
       estado: (p.status as EstadoProjeto) || 'por-fazer',
-      categoria: '',              // vamos preencher com o CategoriesService
+      categoria: '',
       categoriaId: p.category_id
     };
   }
@@ -99,16 +114,13 @@ export class DetalhesProjetoPage implements OnInit {
     };
   }
 
-  // --------- MAP BD → FRONT (TAREFA, igual à home) ---------
-
   private mapTaskToTarefa(task: Task, todayStr: string, projectName: string): Tarefa {
-    // data/hora legível
     let dataLegivel = '';
     let deadline: Date | null = null;
 
     if (task.due_date) {
-      const base = task.due_date;                 // 'YYYY-MM-DD'
-      const time = task.due_time || '00:00:00';   // 'HH:MM:SS'
+      const base = task.due_date;
+      const time = task.due_time || '00:00:00';
       const iso = `${base}T${time}`;
       const d = new Date(iso);
       deadline = d;
@@ -121,7 +133,6 @@ export class DetalhesProjetoPage implements OnInit {
 
     const now = new Date();
 
-    // estado (considera data + hora)
     let estado: 'por-fazer' | 'feito' | 'atrasada';
     if (task.completed) {
       estado = 'feito';
@@ -131,7 +142,6 @@ export class DetalhesProjetoPage implements OnInit {
       estado = 'por-fazer';
     }
 
-    // tipo aqui não interessa para filtragem, mas mantemos o campo
     let tipo: 'hoje' | 'proximas' | 'atrasadas';
     if (task.due_date === todayStr) {
       tipo = 'hoje';
@@ -144,15 +154,13 @@ export class DetalhesProjetoPage implements OnInit {
     return {
       id: task.id || 0,
       titulo: task.title,
-      projeto: projectName,           // aqui usamos o nome REAL do projeto
+      projeto: projectName,
       descricao: task.description || '',
       dataLimite: dataLegivel,
       estado,
       tipo
     };
   }
-
-  // --------- CARREGAR PROJETO ---------
 
   async carregarProjeto(projectId: number) {
     console.log('carregarProjeto()', projectId);
@@ -166,21 +174,16 @@ export class DetalhesProjetoPage implements OnInit {
 
     this.projeto = this.mapProjectToFront(data);
 
-    // buscar nome real da categoria
     const categoria: Category | null =
       await this.categoriesService.getCategoryById(this.projeto.categoriaId);
-
     this.projeto.categoria = categoria ? categoria.name : 'Sem categoria';
 
     console.log('this.projeto =', this.projeto);
   }
 
-  // --------- CARREGAR TAREFAS DO PROJETO ---------
-
   private async carregarTarefasDoProjeto(projectId: number, projectName: string) {
     console.log('carregarTarefasDoProjeto()', projectId);
 
-    // construir todayStr tal como na home
     const hoje = new Date();
     const yyyy = hoje.getFullYear();
     const mm = String(hoje.getMonth() + 1).padStart(2, '0');
@@ -188,64 +191,57 @@ export class DetalhesProjetoPage implements OnInit {
     const todayStr = `${yyyy}-${mm}-${dd}`;
 
     const tasks = await this.tasksService.getTasksByProject(projectId);
-    console.log('tarefas BD =', tasks);
+    console.log('✅ Detalhes-Projeto: tarefas BD =', tasks.length);
 
     this.tarefas = tasks.map(t => this.mapTaskToTarefa(t, todayStr, projectName));
-    console.log('tarefas FRONT =', this.tarefas);
+    console.log('✅ Detalhes-Projeto: tarefas FRONT =', this.tarefas.length);
   }
 
-  // 3 pontinhos do header
   abrirOpcoesProjeto() {
     this.opcoesService.abrirEditarEliminar(
       'projeto',
       this.projeto.nome,
-      () => this.abrirEditarProjeto(),   // EDITAR
-      async () => {                      // ELIMINAR
+      () => this.abrirEditarProjeto(),
+      async () => {
         await this.projectsService.deleteProject(this.projeto.id);
         this.router.navigate(['/projetos', this.projeto.categoriaId]);
       }
     );
   }
 
-  // abre a sheet de edição
   abrirEditarProjeto() {
     this.projetoEditavel = { ...this.projeto };
     console.log('ANTES de editar', this.projetoEditavel);
     this.isModalEditarProjetoAberto = true;
   }
 
-  // fecha a sheet sem guardar
   fecharEditarProjeto() {
     this.isModalEditarProjetoAberto = false;
   }
 
-  // guarda alterações feitas no sheet
   async guardarEditarProjeto() {
     console.log('A GUARDAR, projetoEditavel =', this.projetoEditavel);
 
-    // garantir que categoriaId é número (o ion-select pode mandar string)
     this.projetoEditavel.categoriaId = Number(this.projetoEditavel.categoriaId);
 
-    // atualizar na BD com o que está em projetoEditavel (inclui categoriaId)
     await this.projectsService.updateProject(
       this.mapFrontToProject(this.projetoEditavel)
     );
 
-    // recarregar projeto a partir da BD (para atualizar nome da categoria, etc.)
     await this.carregarProjeto(this.projetoEditavel.id);
-
     this.isModalEditarProjetoAberto = false;
   }
 
-  // navegar para detalhes de tarefa
   abrirDetalhesTarefas(tarefa: Tarefa) {
-    this.router.navigate(['/detalhes-tarefas', tarefa.id]);
+    this.router.navigate(['/detalhes-tarefas', tarefa.id], {
+      queryParams: { from: 'project', projectId: this.projeto.id }
+    });
   }
 
-  // chamado pelo (fecharModal) do componente de nova tarefa
   async onNovaTarefaProjetoFechar(task: Task | null) {
     this.isModalAberto = false;
 
+    console.log('📝 Detalhes-Projeto: modal fechou, task?', task ? task.id : 'null');
     if (task && this.projeto) {
       await this.carregarTarefasDoProjeto(this.projeto.id, this.projeto.nome);
     }

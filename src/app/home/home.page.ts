@@ -1,5 +1,5 @@
 import { Component, OnDestroy } from '@angular/core';
-import { Router, NavigationEnd } from '@angular/router';
+import { Router, NavigationEnd, ActivatedRoute } from '@angular/router';
 import { Tarefa } from '../components/cartoes-tarefas/cartoes-tarefas.component';
 import { TasksService } from '../services/tasks.service';
 import { Task } from '../services/task';
@@ -26,15 +26,16 @@ export class HomePage implements OnDestroy {
 
   constructor(
     private router: Router,
+    private route: ActivatedRoute,
     private tasksService: TasksService,
     private projectsService: ProjectsService
   ) {
-    // escuta navegação para esta página e recarrega sempre
+    // escuta navegação APENAS se vier com queryParam _reload
     this.routerSub = this.router.events
       .pipe(filter(event => event instanceof NavigationEnd))
       .subscribe((event: any) => {
-        if (event.url.includes('/tabs/home')) {
-          console.log('🔄 Home: rota mudou, a recarregar...');
+        if (event.url.includes('/tabs/home') && event.url.includes('_reload')) {
+          console.log('🔄 Home: detectou _reload na URL, a recarregar...');
           this.carregarProjetos().then(() => this.carregarTarefas());
         }
       });
@@ -154,6 +155,8 @@ export class HomePage implements OnDestroy {
   }
 
   abrirDetalhesTarefas(tarefa: Tarefa) {
-    this.router.navigate(['/detalhes-tarefas', tarefa.id]);
+    this.router.navigate(['/detalhes-tarefas', tarefa.id], {
+      queryParams: { from: 'home' }
+    });
   }
 }
