@@ -20,7 +20,7 @@ interface DetalheTarefa {
   dataHora: string;
   estado: EstadoTarefa;
   categoria: string;
-  categoriaId: number;  // ← NOVO: guardar id da categoria
+  categoriaId: number;
   imagemUrl: string;
 }
 
@@ -37,13 +37,9 @@ export class DetalhesTarefasPage implements OnInit {
   isModalEditarAberto = false;
   tarefaEditavel!: DetalheTarefa;
 
-  // ← NOVO: lista de categorias para o modal de editar
   categorias: Category[] = [];
-  
-  // projetos da categoria selecionada no modal
   projetos: { id: number; nome: string }[] = [];
 
-  // guarda de onde veio
   private origemNavegacao: string = '';
   private origemProjectId?: number;
 
@@ -65,14 +61,12 @@ export class DetalhesTarefasPage implements OnInit {
       return;
     }
 
-    // captura de onde veio
     this.origemNavegacao = this.route.snapshot.queryParamMap.get('from') || '';
     const projId = this.route.snapshot.queryParamMap.get('projectId');
     this.origemProjectId = projId ? +projId : undefined;
 
     console.log('🔍 Detalhes-Tarefas: origem =', this.origemNavegacao, 'projectId =', this.origemProjectId);
 
-    // ← NOVO: carrega categorias para o modal de editar
     this.categorias = await this.categoriesService.getAllCategories();
 
     await this.carregarTarefa();
@@ -110,7 +104,7 @@ export class DetalhesTarefasPage implements OnInit {
         projetoId = project.id ?? task.project_id;
 
         if (project.category_id) {
-          categoriaId = project.category_id;  // ← NOVO
+          categoriaId = project.category_id;
           
           const categoria: Category | null =
             await this.categoriesService.getCategoryById(project.category_id);
@@ -118,7 +112,6 @@ export class DetalhesTarefasPage implements OnInit {
             categoriaNome = categoria.name;
           }
 
-          // carrega projetos da mesma categoria para o select do modal
           const projetosMesmaCategoria = await this.projectsService.getProjectsByCategory(project.category_id);
           this.projetos = projetosMesmaCategoria.map(p => ({
             id: p.id ?? 0,
@@ -139,7 +132,7 @@ export class DetalhesTarefasPage implements OnInit {
       dataHora: horaFormatada,
       estado,
       categoria: categoriaNome,
-      categoriaId,  // ← NOVO
+      categoriaId,
       imagemUrl: task.image_url || 'assets/imagens/tarefas/estudar.jpg'
     };
   }
@@ -183,6 +176,21 @@ export class DetalhesTarefasPage implements OnInit {
     this.tarefa = await this.mapTaskToDetalhe(task);
   }
 
+  // NOVO: método para voltar com reload
+  voltarParaOrigem() {
+    console.log('⬅️ Voltar para origem:', this.origemNavegacao);
+    
+    if (this.origemNavegacao === 'project' && this.origemProjectId) {
+      this.router.navigate(['/detalhes-projeto', this.origemProjectId], { 
+        queryParams: { _reload: Date.now() }
+      });
+    } else {
+      this.router.navigate(['/tabs/home'], { 
+        queryParams: { _reload: Date.now() }
+      });
+    }
+  }
+
   abrirOpcoesTarefa() {
     this.opcoesService.abrirEditarEliminar(
       'tarefa',
@@ -194,14 +202,12 @@ export class DetalhesTarefasPage implements OnInit {
         
         console.log('⬅️ A voltar para origem:', this.origemNavegacao);
         
-        // volta para onde veio
         if (this.origemNavegacao === 'project' && this.origemProjectId) {
           console.log('   → detalhes-projeto', this.origemProjectId);
           this.router.navigate(['/detalhes-projeto', this.origemProjectId], { 
             queryParams: { _reload: Date.now() }
           });
         } else {
-          // default: volta para home (inclui quando veio de 'home' ou sem origem)
           console.log('   → home');
           this.router.navigate(['/tabs/home'], { 
             queryParams: { _reload: Date.now() }
@@ -220,7 +226,6 @@ export class DetalhesTarefasPage implements OnInit {
     this.isModalEditarAberto = false;
   }
 
-  // ← NOVO: quando muda categoria no modal de editar, recarrega projetos
   async onCategoriaChangeEditar() {
     if (!this.tarefaEditavel.categoriaId) {
       this.projetos = [];
@@ -234,7 +239,6 @@ export class DetalhesTarefasPage implements OnInit {
       nome: p.name
     }));
 
-    // reset projeto selecionado
     this.tarefaEditavel.projetoId = 0;
   }
 
@@ -251,8 +255,9 @@ export class DetalhesTarefasPage implements OnInit {
     const taskToUpdate = this.mapDetalheToTask(this.tarefaEditavel);
     await this.tasksService.updateTask(taskToUpdate);
 
+    this.fecharEditarTarefa();
+    
     // recarrega tarefa atualizada
     await this.carregarTarefa();
-    this.fecharEditarTarefa();
   }
 }
