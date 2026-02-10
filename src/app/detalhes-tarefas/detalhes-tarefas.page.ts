@@ -20,6 +20,7 @@ interface DetalheTarefa {
   dataHora: string;
   estado: EstadoTarefa;
   categoria: string;
+  categoriaId: number;  // ← NOVO: guardar id da categoria
   imagemUrl: string;
 }
 
@@ -36,6 +37,10 @@ export class DetalhesTarefasPage implements OnInit {
   isModalEditarAberto = false;
   tarefaEditavel!: DetalheTarefa;
 
+  // ← NOVO: lista de categorias para o modal de editar
+  categorias: Category[] = [];
+  
+  // projetos da categoria selecionada no modal
   projetos: { id: number; nome: string }[] = [];
 
   // guarda de onde veio
@@ -67,6 +72,9 @@ export class DetalhesTarefasPage implements OnInit {
 
     console.log('🔍 Detalhes-Tarefas: origem =', this.origemNavegacao, 'projectId =', this.origemProjectId);
 
+    // ← NOVO: carrega categorias para o modal de editar
+    this.categorias = await this.categoriesService.getAllCategories();
+
     await this.carregarTarefa();
   }
 
@@ -91,6 +99,7 @@ export class DetalhesTarefasPage implements OnInit {
     const estado: EstadoTarefa = task.completed ? 'feito' : 'por-fazer';
 
     let categoriaNome = 'Sem categoria';
+    let categoriaId = 0;
     let projetoNome = 'Sem projeto';
     let projetoId = task.project_id ?? 0;
 
@@ -101,12 +110,15 @@ export class DetalhesTarefasPage implements OnInit {
         projetoId = project.id ?? task.project_id;
 
         if (project.category_id) {
+          categoriaId = project.category_id;  // ← NOVO
+          
           const categoria: Category | null =
             await this.categoriesService.getCategoryById(project.category_id);
           if (categoria) {
             categoriaNome = categoria.name;
           }
 
+          // carrega projetos da mesma categoria para o select do modal
           const projetosMesmaCategoria = await this.projectsService.getProjectsByCategory(project.category_id);
           this.projetos = projetosMesmaCategoria.map(p => ({
             id: p.id ?? 0,
@@ -127,6 +139,7 @@ export class DetalhesTarefasPage implements OnInit {
       dataHora: horaFormatada,
       estado,
       categoria: categoriaNome,
+      categoriaId,  // ← NOVO
       imagemUrl: task.image_url || 'assets/imagens/tarefas/estudar.jpg'
     };
   }
@@ -207,6 +220,24 @@ export class DetalhesTarefasPage implements OnInit {
     this.isModalEditarAberto = false;
   }
 
+  // ← NOVO: quando muda categoria no modal de editar, recarrega projetos
+  async onCategoriaChangeEditar() {
+    if (!this.tarefaEditavel.categoriaId) {
+      this.projetos = [];
+      this.tarefaEditavel.projetoId = 0;
+      return;
+    }
+
+    const data = await this.projectsService.getProjectsByCategory(this.tarefaEditavel.categoriaId);
+    this.projetos = data.map(p => ({
+      id: p.id ?? 0,
+      nome: p.name
+    }));
+
+    // reset projeto selecionado
+    this.tarefaEditavel.projetoId = 0;
+  }
+
   async guardarEditarTarefa() {
     if (this.tarefaEditavel.dataLimite) {
       const d = new Date(this.tarefaEditavel.dataLimite);
@@ -220,7 +251,8 @@ export class DetalhesTarefasPage implements OnInit {
     const taskToUpdate = this.mapDetalheToTask(this.tarefaEditavel);
     await this.tasksService.updateTask(taskToUpdate);
 
-    this.tarefa = { ...this.tarefaEditavel };
+    // recarrega tarefa atualizada
+    await this.carregarTarefa();
     this.fecharEditarTarefa();
   }
 }

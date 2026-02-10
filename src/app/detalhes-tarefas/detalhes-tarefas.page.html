@@ -14,12 +14,10 @@
         <ion-icon name="ellipsis-vertical"></ion-icon>
       </ion-button>
     </ion-buttons>
-
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true" *ngIf="tarefa">
-
   <!-- Imagem da tarefa -->
   <ion-card class="tarefa-img-card">
     <ion-img [src]="tarefa.imagemUrl" alt="Imagem da tarefa"></ion-img>
@@ -40,6 +38,7 @@
           <ion-input [value]="tarefa.dataData" readonly="true"></ion-input>
         </ion-item>
       </ion-col>
+
       <ion-col size="5">
         <ion-item lines="full">
           <ion-label position="stacked">Hora</ion-label>
@@ -106,7 +105,6 @@
       </ion-header>
 
       <ion-content fullscreen="true" class="editar-tarefa-content">
-
         <!-- Imagem -->
         <ion-item lines="none">
           <ion-label position="stacked">Imagem da tarefa</ion-label>
@@ -117,9 +115,7 @@
         </ion-item>
 
         <ion-item lines="none" class="preview-wrapper-editar">
-          <img
-            [src]="tarefaEditavel.imagemUrl"
-            alt="Pré-visualização">
+          <img [src]="tarefaEditavel.imagemUrl" alt="Pré-visualização">
         </ion-item>
 
         <!-- Título -->
@@ -157,7 +153,20 @@
           </ion-textarea>
         </ion-item>
 
-        <!-- Projeto (id) -->
+        <!-- Categoria -->
+        <ion-item lines="full">
+          <ion-label position="stacked">Categoria</ion-label>
+          <ion-select
+            placeholder="Selecionar categoria"
+            [(ngModel)]="tarefaEditavel.categoriaId"
+            (ionChange)="onCategoriaChangeEditar()">
+            <ion-select-option *ngFor="let c of categorias" [value]="c.id">
+              {{ c.name }}
+            </ion-select-option>
+          </ion-select>
+        </ion-item>
+
+        <!-- Projeto -->
         <ion-item lines="full">
           <ion-label position="stacked">Projeto</ion-label>
           <ion-select
@@ -183,11 +192,9 @@
           expand="block"
           color="roxo"
           class="btn-guardar-editar"
-          (click)="guardarEditarTarefa()"
-        >
+          (click)="guardarEditarTarefa()">
           Guardar alterações
         </ion-button>
-
       </ion-content>
     </ng-template>
   </ion-modal>
