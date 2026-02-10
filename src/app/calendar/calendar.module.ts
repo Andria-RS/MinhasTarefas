@@ -1,14 +1,10 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-
 import { IonicModule } from '@ionic/angular';
-
 import { CalendarPageRoutingModule } from './calendar-routing.module';
-
 import { CalendarPage } from './calendar.page';
-
-import { ComponentsModule } from '../components/components.module';
+import { ComponentsModule } from '../components/components.module'; // ← Importa o módulo
 
 @NgModule({
   imports: [
@@ -16,7 +12,7 @@ import { ComponentsModule } from '../components/components.module';
     FormsModule,
     IonicModule,
     CalendarPageRoutingModule,
-    ComponentsModule
+    ComponentsModule  // ← Adiciona aqui (não o componente diretamente)
   ],
   declarations: [CalendarPage]
 })

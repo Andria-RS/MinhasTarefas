@@ -5,34 +5,42 @@
 </ion-header>
 
 <ion-content [fullscreen]="true">
-
   <div class="cal-wrapper">
-    <!-- Calendário mensal com números -->
+    <!-- Calendário mensal com destaque para dias com tarefas -->
     <ion-datetime
+      #datetime
       presentation="date"
       [showDefaultButtons]="false"
       showDefaultTitle="false"
       showDefaultTimeLabel="false"
       firstDayOfWeek="1"
-      locale="pt-PT">
+      locale="pt-PT"
+      [value]="dataSelecionada"
+      [highlightedDates]="highlightedDates"
+      (ionChange)="onDateChange($event)">
     </ion-datetime>
 
-    <div class="tasks-wrapper">
-      <ion-item lines="none">
-        <ion-label>
-          <h2>Hoje</h2>
-          <p>{{ tarefasHoje.length }} tarefa(s)</p>
-        </ion-label>
-      </ion-item>
+    <!-- Lista de tarefas do dia selecionado -->
+    <div class="tasks-wrapper" *ngIf="dataSelecionada">
+      <div class="day-header">
+        <h2>{{ getDataFormatada() }}</h2>
+        <p class="task-count">{{ tarefasDoDia.length }} tarefa(s)</p>
+      </div>
 
-      <ion-list lines="none">
+      <!-- Mensagem se não houver tarefas -->
+      <div class="empty-state" *ngIf="tarefasDoDia.length === 0">
+        <ion-icon name="calendar-outline" size="large"></ion-icon>
+        <p>Sem tarefas para este dia</p>
+      </div>
+
+      <!-- Lista de cards de tarefas -->
+      <ion-list lines="none" *ngIf="tarefasDoDia.length > 0">
         <app-cartoes-tarefas
-          *ngFor="let tarefa of tarefasHoje"
-          [tarefa]="tarefa">
+          *ngFor="let tarefa of tarefasDoDia"
+          [tarefa]="tarefa"
+          (abrirDetalhes)="abrirDetalhesTarefa($event)">
         </app-cartoes-tarefas>
       </ion-list>
     </div>
   </div>
-
 </ion-content>
-
