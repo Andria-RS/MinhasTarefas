@@ -3,6 +3,13 @@ ion-content {
   --padding-end: 12px;
 }
 
+// Muda azul para roxo no calendário
+ion-datetime {
+  --ion-color-base: var(--ion-color-roxo);
+  --ion-color-primary: var(--ion-color-roxo);
+}
+
+
 /* Wrapper para centrar tudo e limitar a largura */
 .cal-wrapper {
   display: flex;
@@ -36,148 +43,4 @@ ion-content {
   padding: 0;
 }
 
-
-
-// ========================================
-// LISTA DE TAREFAS DO DIA (Parte de baixo)
-// ========================================
-.tasks-wrapper {
-  width: 100%;
-  max-width: 420px;
-  margin-top: 20px;
-  padding: 0 4px;
-
-  // Cabeçalho do dia selecionado (ex: "Hoje", "Sábado, 14 De Fevereiro")
-  .day-header {
-    margin-bottom: 16px;
-    padding: 0 8px 12px 8px;
-    border-bottom: 2px solid rgba(var(--ion-color-light-rgb), 0.2);
-
-    h2 {
-      font-size: 22px;
-      font-weight: 700;
-      margin: 0 0 6px 0;
-      color: var(--ion-color-dark);
-      text-transform: capitalize;
-      letter-spacing: -0.3px;
-    }
-
-    .task-count {
-      font-size: 14px;
-      font-weight: 500;
-      color: var(--ion-color-medium);
-      margin: 0;
-      
-      // Bolinha roxa antes do contador
-      &::before {
-        content: '•';
-        color: var(--ion-color-roxo);
-        margin-right: 6px;
-        font-size: 16px;
-        vertical-align: middle;
-      }
-    }
-  }
-
-  // Mensagem quando não há tarefas
-  .empty-state {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 60px 24px;
-    text-align: center;
-    margin-top: 24px;
-
-    ion-icon {
-      font-size: 72px;
-      color: var(--ion-color-medium);
-      opacity: 0.25;
-      margin-bottom: 20px;
-    }
-
-    p {
-      font-size: 15px;
-      color: var(--ion-color-medium);
-      margin: 0;
-      font-weight: 500;
-    }
-  }
-
-  // Lista de cards de tarefas
-  ion-list {
-    padding: 0;
-    background: transparent;
-    margin-top: 8px;
-
-    app-cartoes-tarefas {
-      display: block;
-      margin-bottom: 12px;
-      
-      // Animação suave ao aparecer
-      animation: slideInUp 0.3s ease-out;
-      
-      &:last-child {
-        margin-bottom: 0;
-      }
-    }
-  }
-}
-
-// ========================================
-// ANIMAÇÃO DOS CARDS
-// ========================================
-@keyframes slideInUp {
-  from {
-    opacity: 0;
-    transform: translateY(15px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-// ========================================
-// SCROLL SUAVE (se a lista ficar grande)
-// ========================================
-.tasks-wrapper {
-  &::-webkit-scrollbar {
-    width: 4px;
-  }
-
-  &::-webkit-scrollbar-track {
-    background: transparent;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background: rgba(var(--ion-color-medium-rgb), 0.2);
-    border-radius: 10px;
-    
-    &:hover {
-      background: rgba(var(--ion-color-medium-rgb), 0.4);
-    }
-  }
-}
-
-// ========================================
-// RESPONSIVO (ecrãs pequenos)
-// ========================================
-@media (max-width: 360px) {
-  .tasks-wrapper {
-    margin-top: 16px;
-
-    .day-header h2 {
-      font-size: 18px;
-    }
-
-    .empty-state {
-      padding: 40px 16px;
-
-      ion-icon {
-        font-size: 56px;
-      }
-    }
-  }
-}
 
