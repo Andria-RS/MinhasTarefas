@@ -4,6 +4,63 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  
+<ion-content>
+  <!-- Botão marcar tudo como lido -->
+  <div class="actions-bar" *ngIf="notificacoes.length > 0 && naoLidasCount > 0">
+    <ion-button 
+      fill="clear" 
+      color="roxo" 
+      (click)="marcarTodasComoLidas()">
+      <ion-icon slot="start" name="checkmark-done-outline"></ion-icon>
+      Marcar tudo como lido
+    </ion-button>
+  </div>
+
+  <!-- Estado vazio -->
+  <div *ngIf="notificacoes.length === 0" class="empty-state">
+    <ion-icon name="notifications-off-outline" class="empty-icon"></ion-icon>
+    <p>Sem notificações</p>
+  </div>
+
+  <!-- Lista de notificações -->
+  <ion-list *ngIf="notificacoes.length > 0">
+    <ion-item-sliding *ngFor="let notif of notificacoes" #slidingItem>
+      <ion-item 
+        [class.nao-lida]="!notif.lida" 
+        (click)="abrirTarefa(notif)"
+        lines="full">
+        <div class="notificacao-content">
+          <div class="notificacao-header">
+            <h3>{{ notif.titulo }}</h3>
+            <span class="indicador-nao-lida" *ngIf="!notif.lida"></span>
+          </div>
+          <p class="notificacao-mensagem">{{ notif.mensagem }}</p>
+          <div class="notificacao-meta">
+            <span class="data">
+              <ion-icon name="calendar-outline"></ion-icon>
+              {{ formatarData(notif.data) }}
+            </span>
+            <span class="hora">
+              <ion-icon name="time-outline"></ion-icon>
+              {{ notif.hora }}
+            </span>
+          </div>
+        </div>
+      </ion-item>
+
+      <!-- Swipe para a esquerda - Marcar como lida -->
+      <ion-item-options side="start">
+        <ion-item-option color="roxo" (click)="marcarComoLida(notif, slidingItem)">
+          <ion-icon slot="icon-only" name="checkmark-circle"></ion-icon>
+        </ion-item-option>
+      </ion-item-options>
+
+      <!-- Swipe para a direita - Apagar -->
+      <ion-item-options side="end">
+        <ion-item-option color="danger" (click)="apagarNotificacao(notif, slidingItem)">
+          <ion-icon slot="icon-only" name="trash"></ion-icon>
+        </ion-item-option>
+      </ion-item-options>
+    </ion-item-sliding>
+  </ion-list>
 </ion-content>
