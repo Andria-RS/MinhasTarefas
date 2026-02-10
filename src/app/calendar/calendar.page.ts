@@ -27,21 +27,14 @@ export class CalendarPage implements OnInit {
   async ngOnInit() {
     console.log('📅 CalendarPage: Iniciando...');
     
-    // Carrega projetos primeiro
     await this.carregarProjetos();
-    
-    // Carrega todas as tarefas
     await this.carregarTarefas();
     
-    // Define hoje como data inicial
     const hoje = new Date();
     hoje.setHours(0, 0, 0, 0);
     this.dataSelecionada = hoje.toISOString();
     
-    // Carrega tarefas de hoje
     this.filtrarTarefasDoDia();
-    
-    // ✅ ADICIONA AQUI - Força capitalização do mês
     this.forcarCapitalizacao();
     
     console.log('📅 Data selecionada:', this.dataSelecionada);
@@ -198,12 +191,13 @@ export class CalendarPage implements OnInit {
   }
 
   abrirDetalhesTarefa(tarefa: Tarefa) {
-    this.router.navigate(['/detalhes-tarefas', tarefa.id]);
+    // ✅ Adiciona queryParams para indicar que veio do calendário
+    this.router.navigate(['/detalhes-tarefas', tarefa.id], {
+      queryParams: { from: 'calendar' }
+    });
   }
 
-  // ✅ ADICIONA ESTE MÉTODO AQUI NO FINAL
   forcarCapitalizacao() {
-    // Força primeira letra maiúscula no botão do mês
     setTimeout(() => {
       const monthButton = document.querySelector('ion-datetime')?.shadowRoot
         ?.querySelector('[part="month-year-button"]') as HTMLElement;

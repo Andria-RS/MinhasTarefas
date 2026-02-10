@@ -176,7 +176,7 @@ export class DetalhesTarefasPage implements OnInit {
     this.tarefa = await this.mapTaskToDetalhe(task);
   }
 
-  // NOVO: método para voltar com reload
+  // Método voltarParaOrigem() - SUBSTITUI COMPLETAMENTE
   voltarParaOrigem() {
     console.log('⬅️ Voltar para origem:', this.origemNavegacao);
     
@@ -184,13 +184,20 @@ export class DetalhesTarefasPage implements OnInit {
       this.router.navigate(['/detalhes-projeto', this.origemProjectId], { 
         queryParams: { _reload: Date.now() }
       });
+    } else if (this.origemNavegacao === 'calendar') {
+      // ✅ Volta para o calendário
+      this.router.navigate(['/tabs/calendar'], { 
+        queryParams: { _reload: Date.now() }
+      });
     } else {
+      // Padrão: volta para home
       this.router.navigate(['/tabs/home'], { 
         queryParams: { _reload: Date.now() }
       });
     }
   }
 
+  // Dentro do método abrirOpcoesTarefa() - SUBSTITUI a função async de eliminar
   abrirOpcoesTarefa() {
     this.opcoesService.abrirEditarEliminar(
       'tarefa',
@@ -203,12 +210,18 @@ export class DetalhesTarefasPage implements OnInit {
         console.log('⬅️ A voltar para origem:', this.origemNavegacao);
         
         if (this.origemNavegacao === 'project' && this.origemProjectId) {
-          console.log('   → detalhes-projeto', this.origemProjectId);
+          console.log(' → detalhes-projeto', this.origemProjectId);
           this.router.navigate(['/detalhes-projeto', this.origemProjectId], { 
             queryParams: { _reload: Date.now() }
           });
+        } else if (this.origemNavegacao === 'calendar') {
+          // ✅ Volta para o calendário
+          console.log(' → calendar');
+          this.router.navigate(['/tabs/calendar'], { 
+            queryParams: { _reload: Date.now() }
+          });
         } else {
-          console.log('   → home');
+          console.log(' → home');
           this.router.navigate(['/tabs/home'], { 
             queryParams: { _reload: Date.now() }
           });
@@ -216,6 +229,7 @@ export class DetalhesTarefasPage implements OnInit {
       }
     );
   }
+
 
   abrirEditarTarefa() {
     this.tarefaEditavel = { ...this.tarefa };
