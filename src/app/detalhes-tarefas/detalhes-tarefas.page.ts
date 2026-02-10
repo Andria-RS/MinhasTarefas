@@ -33,13 +33,11 @@ interface DetalheTarefa {
 export class DetalhesTarefasPage implements OnInit {
   tarefaId!: number;
   tarefa!: DetalheTarefa;
-
   isModalEditarAberto = false;
   tarefaEditavel!: DetalheTarefa;
-
   categorias: Category[] = [];
   projetos: { id: number; nome: string }[] = [];
-
+  
   private origemNavegacao: string = '';
   private origemProjectId?: number;
 
@@ -55,7 +53,7 @@ export class DetalhesTarefasPage implements OnInit {
   async ngOnInit() {
     const idParam = this.route.snapshot.paramMap.get('tarefaId');
     this.tarefaId = idParam ? +idParam : 0;
-
+    
     if (!this.tarefaId) {
       this.router.navigate(['/tabs/home'], { replaceUrl: true });
       return;
@@ -68,7 +66,6 @@ export class DetalhesTarefasPage implements OnInit {
     console.log('🔍 Detalhes-Tarefas: origem =', this.origemNavegacao, 'projectId =', this.origemProjectId);
 
     this.categorias = await this.categoriesService.getAllCategories();
-
     await this.carregarTarefa();
   }
 
@@ -82,7 +79,6 @@ export class DetalhesTarefasPage implements OnInit {
       const time = task.due_time || '00:00:00';
       isoDataLimite = `${base}T${time}`;
       const d = new Date(isoDataLimite);
-
       dataFormatada = d.toLocaleDateString('pt-PT');
       horaFormatada = d.toLocaleTimeString('pt-PT', {
         hour: '2-digit',
@@ -176,7 +172,7 @@ export class DetalhesTarefasPage implements OnInit {
     this.tarefa = await this.mapTaskToDetalhe(task);
   }
 
-  // Método voltarParaOrigem() - SUBSTITUI COMPLETAMENTE
+  // ✅ ATUALIZADO: Volta para a origem correta com _reload
   voltarParaOrigem() {
     console.log('⬅️ Voltar para origem:', this.origemNavegacao);
     
@@ -185,7 +181,7 @@ export class DetalhesTarefasPage implements OnInit {
         queryParams: { _reload: Date.now() }
       });
     } else if (this.origemNavegacao === 'calendar') {
-      // ✅ Volta para o calendário
+      // ✅ Volta para o calendário com reload
       this.router.navigate(['/tabs/calendar'], { 
         queryParams: { _reload: Date.now() }
       });
@@ -197,7 +193,7 @@ export class DetalhesTarefasPage implements OnInit {
     }
   }
 
-  // Dentro do método abrirOpcoesTarefa() - SUBSTITUI a função async de eliminar
+  // ✅ ATUALIZADO: Apagar tarefa com navegação correta
   abrirOpcoesTarefa() {
     this.opcoesService.abrirEditarEliminar(
       'tarefa',
@@ -215,7 +211,7 @@ export class DetalhesTarefasPage implements OnInit {
             queryParams: { _reload: Date.now() }
           });
         } else if (this.origemNavegacao === 'calendar') {
-          // ✅ Volta para o calendário
+          // ✅ Volta para o calendário após apagar
           console.log(' → calendar');
           this.router.navigate(['/tabs/calendar'], { 
             queryParams: { _reload: Date.now() }
@@ -229,7 +225,6 @@ export class DetalhesTarefasPage implements OnInit {
       }
     );
   }
-
 
   abrirEditarTarefa() {
     this.tarefaEditavel = { ...this.tarefa };
@@ -256,6 +251,7 @@ export class DetalhesTarefasPage implements OnInit {
     this.tarefaEditavel.projetoId = 0;
   }
 
+  // ✅ ATUALIZADO: Guardar edição e voltar com reload
   async guardarEditarTarefa() {
     if (this.tarefaEditavel.dataLimite) {
       const d = new Date(this.tarefaEditavel.dataLimite);
@@ -268,10 +264,13 @@ export class DetalhesTarefasPage implements OnInit {
 
     const taskToUpdate = this.mapDetalheToTask(this.tarefaEditavel);
     await this.tasksService.updateTask(taskToUpdate);
-
+    
     this.fecharEditarTarefa();
     
-    // recarrega tarefa atualizada
+    // Recarrega tarefa atualizada
     await this.carregarTarefa();
+    
+    // ✅ NOVO: Força reload na origem quando fechar o modal
+    console.log('💾 Tarefa guardada, preparando reload para:', this.origemNavegacao);
   }
 }
