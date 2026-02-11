@@ -1,6 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { IonItemSliding } from '@ionic/angular';
+import { TasksService } from '../services/tasks.service';
+import { Task } from '../services/task';
+import { getSupabase } from '../services/supabase.client';
+
 
 interface Notificacao {
   id: number;
@@ -22,7 +26,10 @@ export class NotificationsPage implements OnInit {
   notificacoes: Notificacao[] = [];
   naoLidasCount: number = 0;
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private tasksService: TasksService, // ✅ NOVO
+  ) {}
 
   ngOnInit() {
     this.carregarNotificacoes();
@@ -32,78 +39,84 @@ export class NotificationsPage implements OnInit {
     this.carregarNotificacoes();
   }
 
-  carregarNotificacoes() {
-    // Dados mock para testar o frontend
-    this.notificacoes = [
-      {
-        id: 1,
-        tarefa_id: 1,
-        titulo: 'Preparar a mala',
-        mensagem: 'A tarefa "Preparar a mala" termina hoje às 17:15',
-        data: '2026-02-10',
-        hora: '08:00',
-        lida: false
-      },
-      {
-        id: 2,
-        tarefa_id: 2,
-        titulo: 'Estudar para exame',
-        mensagem: 'A tarefa "Estudar para exame" termina amanhã às 12:00',
-        data: '2026-02-09',
-        hora: '12:00',
-        lida: false
-      },
-      {
-        id: 3,
-        tarefa_id: 3,
-        titulo: 'Comprar ingredientes',
-        mensagem: 'A tarefa "Comprar ingredientes" termina em 2 dias às 13:00',
-        data: '2026-02-08',
-        hora: '13:00',
-        lida: true
-      }
-    ];
+  async carregarNotificacoes() {
+    const supabase = getSupabase();
+
+    const { data, error } = await supabase
+      .from('notifications')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Erro a carregar notificações', error);
+      this.notificacoes = [];
+    } else {
+      this.notificacoes = (data || []).map((n: any) => ({
+        id: n.id,
+        tarefa_id: n.tarefa_id,
+        titulo: n.titulo,
+        mensagem: n.mensagem,
+        data: n.data,
+        hora: n.hora.slice(0, 5),
+        lida: n.lida,
+      }));
+    }
 
     this.atualizarContadorNaoLidas();
   }
+
+
 
   atualizarContadorNaoLidas() {
     this.naoLidasCount = this.notificacoes.filter(n => !n.lida).length;
   }
 
-  marcarComoLida(notif: Notificacao, slidingItem: IonItemSliding) {
+  async marcarComoLida(notif: Notificacao, slidingItem: IonItemSliding) {
     notif.lida = true;
     this.atualizarContadorNaoLidas();
     slidingItem.close();
-    
-    // TODO: Atualizar na base de dados quando integrar com Supabase
-    console.log('Marcada como lida:', notif.id);
+
+    const supabase = getSupabase();
+    await supabase
+      .from('notifications')
+      .update({ lida: true })
+      .eq('id', notif.id);
   }
 
-  marcarTodasComoLidas() {
+  async marcarTodasComoLidas() {
     this.notificacoes.forEach(n => n.lida = true);
     this.atualizarContadorNaoLidas();
-    
-    // TODO: Atualizar na base de dados quando integrar com Supabase
-    console.log('Todas marcadas como lidas');
+
+    const ids = this.notificacoes.map(n => n.id);
+    if (ids.length) {
+      const supabase = getSupabase();
+      await supabase
+        .from('notifications')
+        .update({ lida: true })
+        .in('id', ids);
+    }
   }
 
-  apagarNotificacao(notif: Notificacao, slidingItem: IonItemSliding) {
+  async apagarNotificacao(notif: Notificacao, slidingItem: IonItemSliding) {
     this.notificacoes = this.notificacoes.filter(n => n.id !== notif.id);
     this.atualizarContadorNaoLidas();
     slidingItem.close();
-    
-    // TODO: Apagar da base de dados quando integrar com Supabase
-    console.log('Notificação apagada:', notif.id);
+
+    const supabase = getSupabase();
+    await supabase
+      .from('notifications')
+      .delete()
+      .eq('id', notif.id);
   }
+
+
 
   abrirTarefa(notif: Notificacao) {
     if (!notif.lida) {
       notif.lida = true;
       this.atualizarContadorNaoLidas();
     }
-    
-    // Navegar para detalhes da tarefa
+
     this.router.navigate(['/tabs/home/detalhes-tarefa', notif.tarefa_id]);
   }
 
@@ -111,7 +124,7 @@ export class NotificationsPage implements OnInit {
     const data = new Date(dataString + 'T00:00:00');
     const hoje = new Date();
     hoje.setHours(0, 0, 0, 0);
-    
+
     const ontem = new Date(hoje);
     ontem.setDate(ontem.getDate() - 1);
 

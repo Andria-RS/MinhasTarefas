@@ -6,6 +6,9 @@ import { Task } from '../services/task';
 import { ProjectsService } from '../services/projects.service';
 import { CategoriesService } from '../services/categories.service';
 import { Category } from '../services/category';
+import { NotificacoesService } from '../services/notificacoes.service';
+import { getSupabase } from '../services/supabase.client';
+import { construirMensagemNotificacao } from '../services/notificacoes-text.helper';
 
 type EstadoTarefa = 'por-fazer' | 'feito' | 'atrasada';
 
@@ -49,7 +52,8 @@ export class DetalhesTarefasPage implements OnInit {
     private opcoesService: OpcoesService,
     private tasksService: TasksService,
     private projectsService: ProjectsService,
-    private categoriesService: CategoriesService
+    private categoriesService: CategoriesService,
+    private notificacoesService: NotificacoesService
   ) {}
 
   async ngOnInit() {
@@ -266,6 +270,7 @@ export class DetalhesTarefasPage implements OnInit {
   }
 
   async guardarEditarTarefa() {
+    // atualizar campos de data/hora no objeto de detalhe
     if (this.tarefaEditavel.dataLimite) {
       const d = new Date(this.tarefaEditavel.dataLimite);
       this.tarefaEditavel.dataData = d.toLocaleDateString('pt-PT');
@@ -275,16 +280,60 @@ export class DetalhesTarefasPage implements OnInit {
       });
     }
 
+    // transformar DetalheTarefa -> Task
     const taskToUpdate = this.mapDetalheToTask(this.tarefaEditavel);
+
+    // 1) atualizar tarefa na BD
     await this.tasksService.updateTask(taskToUpdate);
-    
+
+    // 2) atualizar notificações locais (1 dia antes + 1 hora antes)
+    if (taskToUpdate.id && taskToUpdate.due_date) {
+      const iso = taskToUpdate.due_time
+        ? `${taskToUpdate.due_date}T${taskToUpdate.due_time}`
+        : `${taskToUpdate.due_date}T09:00:00`;
+
+      // cancelar notificações antigas desta tarefa
+      await this.notificacoesService.cancelarDaTarefa(taskToUpdate.id);
+
+      // agendar novamente com a nova data/hora
+      await this.notificacoesService.agendarParaTarefa(
+        taskToUpdate.id,
+        taskToUpdate.title,
+        iso
+      );
+
+      // 3) atualizar notificação na tabela notifications
+      const supabase = getSupabase();
+
+      const mensagem = construirMensagemNotificacao(
+        taskToUpdate.title,
+        taskToUpdate.due_date,
+        taskToUpdate.due_time ?? undefined
+      );
+      const hora = taskToUpdate.due_time ?? '09:00:00';
+
+      // se já existir uma notificação para esta tarefa, atualiza; senão cria
+      await supabase.from('notifications')
+        .upsert(
+          {
+            tarefa_id: taskToUpdate.id,
+            titulo: taskToUpdate.title,
+            mensagem,
+            data: taskToUpdate.due_date,
+            hora,
+            lida: false
+          },
+          { onConflict: 'tarefa_id' }
+        );
+    }
+
+    // fechar modal e recarregar detalhes
     this.fecharEditarTarefa();
-    
-    // Recarrega tarefa atualizada
     await this.carregarTarefa();
-    
-    console.log('💾 Tarefa guardada, preparando reload para:', this.origemNavegacao);
+
+    console.log('💾 Tarefa guardada, notificações atualizadas.');
   }
+
 }
 
 

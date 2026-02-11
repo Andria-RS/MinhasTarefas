@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { LocalNotifications } from '@capacitor/local-notifications';
 
 @Component({
   selector: 'app-root',
@@ -7,5 +8,14 @@ import { Component } from '@angular/core';
   standalone: false,
 })
 export class AppComponent {
-  constructor() {}
+  constructor() {
+    this.pedirPermissaoNotificacoes();
+  }
+
+  async pedirPermissaoNotificacoes() {
+    const perm = await LocalNotifications.requestPermissions();
+    if (perm.display !== 'granted') {
+      console.warn('Notificações não permitidas');
+    }
+  }
 }
