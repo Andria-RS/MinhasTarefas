@@ -33,8 +33,10 @@ interface DetalheTarefa {
 export class DetalhesTarefasPage implements OnInit {
   tarefaId!: number;
   tarefa!: DetalheTarefa;
+
   isModalEditarAberto = false;
   tarefaEditavel!: DetalheTarefa;
+
   categorias: Category[] = [];
   projetos: { id: number; nome: string }[] = [];
   
@@ -78,6 +80,7 @@ export class DetalhesTarefasPage implements OnInit {
       const base = task.due_date;
       const time = task.due_time || '00:00:00';
       isoDataLimite = `${base}T${time}`;
+
       const d = new Date(isoDataLimite);
       dataFormatada = d.toLocaleDateString('pt-PT');
       horaFormatada = d.toLocaleTimeString('pt-PT', {
@@ -172,7 +175,6 @@ export class DetalhesTarefasPage implements OnInit {
     this.tarefa = await this.mapTaskToDetalhe(task);
   }
 
-  // ✅ ATUALIZADO: Volta para a origem correta com _reload
   voltarParaOrigem() {
     console.log('⬅️ Voltar para origem:', this.origemNavegacao);
     
@@ -181,19 +183,16 @@ export class DetalhesTarefasPage implements OnInit {
         queryParams: { _reload: Date.now() }
       });
     } else if (this.origemNavegacao === 'calendar') {
-      // ✅ Volta para o calendário com reload
       this.router.navigate(['/tabs/calendar'], { 
         queryParams: { _reload: Date.now() }
       });
     } else {
-      // Padrão: volta para home
       this.router.navigate(['/tabs/home'], { 
         queryParams: { _reload: Date.now() }
       });
     }
   }
 
-  // ✅ ATUALIZADO: Apagar tarefa com navegação correta
   abrirOpcoesTarefa() {
     this.opcoesService.abrirEditarEliminar(
       'tarefa',
@@ -211,7 +210,6 @@ export class DetalhesTarefasPage implements OnInit {
             queryParams: { _reload: Date.now() }
           });
         } else if (this.origemNavegacao === 'calendar') {
-          // ✅ Volta para o calendário após apagar
           console.log(' → calendar');
           this.router.navigate(['/tabs/calendar'], { 
             queryParams: { _reload: Date.now() }
@@ -251,7 +249,22 @@ export class DetalhesTarefasPage implements OnInit {
     this.tarefaEditavel.projetoId = 0;
   }
 
-  // ✅ ATUALIZADO: Guardar edição e voltar com reload
+  // ✅ NOVA FUNÇÃO: Seleção de imagem no modal de edição
+  onImageSelectedEditar(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        this.tarefaEditavel.imagemUrl = reader.result as string;
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
+  removerImagemEditar() {
+    this.tarefaEditavel.imagemUrl = '';
+  }
+
   async guardarEditarTarefa() {
     if (this.tarefaEditavel.dataLimite) {
       const d = new Date(this.tarefaEditavel.dataLimite);
@@ -270,7 +283,8 @@ export class DetalhesTarefasPage implements OnInit {
     // Recarrega tarefa atualizada
     await this.carregarTarefa();
     
-    // ✅ NOVO: Força reload na origem quando fechar o modal
     console.log('💾 Tarefa guardada, preparando reload para:', this.origemNavegacao);
   }
 }
+
+
