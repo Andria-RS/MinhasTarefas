@@ -110,12 +110,6 @@
         <!-- Imagem -->
         <ion-item lines="none">
           <ion-label position="stacked">Imagem da tarefa</ion-label>
-          <input 
-            type="file" 
-            accept="image/*" 
-            (change)="onImageSelectedEditar($event)" 
-            #fileInputEditar 
-            style="display: none;">
           <ion-button 
             fill="outline" 
             expand="block" 
@@ -124,8 +118,17 @@
             <ion-icon name="image-outline" slot="start"></ion-icon>
             <ion-label>{{ tarefaEditavel.imagemUrl ? 'Mudar imagem' : 'Escolher imagem' }}</ion-label>
           </ion-button>
+
+          <!-- input escondido como na nova tarefa -->
+          <input 
+            type="file" 
+            accept="image/*" 
+            (change)="onImageSelectedEditar($event)" 
+            #fileInputEditar 
+            style="display: none;">
         </ion-item>
 
+        <!-- Preview igual à nova tarefa -->
         <ion-item lines="none" class="preview-wrapper-editar" *ngIf="tarefaEditavel.imagemUrl">
           <div class="image-container">
             <img [src]="tarefaEditavel.imagemUrl" alt="Pré-visualização">
@@ -134,10 +137,11 @@
               color="danger" 
               class="remove-image-btn"
               (click)="removerImagemEditar()">
-              <ion-icon name="close-circle" slot="icon-only"></ion-icon>
+              <ion-icon name="close-circle"></ion-icon>
             </ion-button>
           </div>
         </ion-item>
+
 
         <!-- Título -->
         <ion-item lines="full">
