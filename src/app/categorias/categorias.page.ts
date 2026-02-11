@@ -20,6 +20,7 @@ interface Categoria {
 export class CategoriasPage implements OnInit {
 
   categorias: Categoria[] = [];
+  categoriasOriginais: Categoria[] = []; // cópia para filtros/pesquisa
 
   // modal Nova/Editar categoria
   isModalCategoriaAberto = false;
@@ -60,7 +61,22 @@ export class CategoriasPage implements OnInit {
 
   async carregarCategorias() {
     const cats = await this.categoriesService.getAllCategories();
-    this.categorias = cats.map(c => this.mapCategoryToCategoria(c));
+    this.categoriasOriginais = cats.map(c => this.mapCategoryToCategoria(c));
+    this.categorias = [...this.categoriasOriginais];
+  }
+
+  // SEARCHBAR
+  filtrarCategorias(ev: any) {
+    const texto: string = (ev.detail?.value || '').toLowerCase().trim();
+
+    if (!texto) {
+      this.categorias = [...this.categoriasOriginais];
+      return;
+    }
+
+    this.categorias = this.categoriasOriginais.filter(cat =>
+      cat.nome.toLowerCase().includes(texto)
+    );
   }
 
   abrirProjetos(cat: Categoria) {
@@ -90,14 +106,14 @@ export class CategoriasPage implements OnInit {
     this.opcoesService.abrirFiltros(
       'categorias',
       () => {
-        // ordem alfabética
+        // ordem alfabética em cima do array atual
         this.categorias = [...this.categorias].sort((a, b) =>
           a.nome.localeCompare(b.nome)
         );
       },
       () => {
-        // por enquanto não temos "ordem original" guardada, só recarregar da BD
-        this.carregarCategorias();
+        // repor lista original (como veio da BD)
+        this.categorias = [...this.categoriasOriginais];
       }
     );
   }

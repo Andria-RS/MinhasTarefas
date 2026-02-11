@@ -11,14 +11,10 @@
 
 <ion-content [fullscreen]="true">
   <ion-item lines="none">
-    <ion-searchbar placeholder="Filtrar projetos"></ion-searchbar>
-    <ion-button
-      fill="clear"
-      slot="end"
-      (click)="abrirFiltrosProjetos()"
-    >
-      <ion-icon name="options-outline"></ion-icon>
-    </ion-button>
+    <ion-searchbar
+      placeholder="Filtrar projetos"
+      (ionInput)="filtrarProjetos($event)">
+    </ion-searchbar>
   </ion-item>
 
   <ion-list>

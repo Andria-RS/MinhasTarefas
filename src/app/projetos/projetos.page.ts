@@ -96,8 +96,23 @@ export class ProjetosPage implements OnInit {
     const data = await this.projectsService.getProjectsByCategory(
       this.categoriaId
     );
-    this.projetos = data.map(d => this.mapProjectToProjeto(d));
-    this.projetosOriginais = [...this.projetos];
+    this.projetosOriginais = data.map(d => this.mapProjectToProjeto(d));
+    this.projetos = [...this.projetosOriginais];
+  }
+
+  // SEARCHBAR
+  filtrarProjetos(ev: any) {
+    const texto: string = (ev.detail?.value || '').toLowerCase().trim();
+
+    if (!texto) {
+      this.projetos = [...this.projetosOriginais];
+      return;
+    }
+
+    this.projetos = this.projetosOriginais.filter(p =>
+      (p.nome || '').toLowerCase().includes(texto) ||
+      (p.descricao || '').toLowerCase().includes(texto)
+    );
   }
 
   abrirDetalhe(projeto: Projeto) {
@@ -108,11 +123,13 @@ export class ProjetosPage implements OnInit {
     this.opcoesService.abrirFiltros(
       'projetos',
       () => {
+        // ordem alfabética
         this.projetos = [...this.projetos].sort((a, b) =>
           a.nome.localeCompare(b.nome)
         );
       },
       () => {
+        // ordem original (como veio da BD)
         this.projetos = [...this.projetosOriginais];
       }
     );
