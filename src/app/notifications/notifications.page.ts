@@ -5,14 +5,13 @@ import { TasksService } from '../services/tasks.service';
 import { Task } from '../services/task';
 import { getSupabase } from '../services/supabase.client';
 
-
 interface Notificacao {
   id: number;
   tarefa_id: number;
   titulo: string;
   mensagem: string;
-  data: string;
-  hora: string;
+  data: string;  // data em que a notificação foi criada/recebida
+  hora: string;  // hora em que a notificação foi criada/recebida
   lida: boolean;
 }
 
@@ -28,7 +27,7 @@ export class NotificationsPage implements OnInit {
 
   constructor(
     private router: Router,
-    private tasksService: TasksService, // ✅ NOVO
+    private tasksService: TasksService,
   ) {}
 
   ngOnInit() {
@@ -56,16 +55,15 @@ export class NotificationsPage implements OnInit {
         tarefa_id: n.tarefa_id,
         titulo: n.titulo,
         mensagem: n.mensagem,
-        data: n.data,
-        hora: n.hora.slice(0, 5),
+        // usar created_at como data/hora da notificação
+        data: n.created_at.slice(0, 10),   // 'YYYY-MM-DD'
+        hora: n.created_at.slice(11, 16),  // 'HH:MM'
         lida: n.lida,
       }));
     }
 
     this.atualizarContadorNaoLidas();
   }
-
-
 
   atualizarContadorNaoLidas() {
     this.naoLidasCount = this.notificacoes.filter(n => !n.lida).length;
@@ -108,8 +106,6 @@ export class NotificationsPage implements OnInit {
       .delete()
       .eq('id', notif.id);
   }
-
-
 
   abrirTarefa(notif: Notificacao) {
     if (!notif.lida) {
