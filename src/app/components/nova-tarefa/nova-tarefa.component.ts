@@ -5,6 +5,7 @@ import { Task } from '../../services/task';
 import { CategoriesService } from '../../services/categories.service';
 import { Category } from '../../services/category';
 import { ProjectsService, Project } from '../../services/projects.service';
+import { ImageService } from '../../services/image.service'; // ✅ ADICIONA esta linha
 
 interface ProjetoOption {
   id: number;
@@ -20,7 +21,6 @@ interface ProjetoOption {
 export class NovaTarefaComponent implements OnInit {
   @Input() projeto?: number;
   @Input() categoria?: any;
-
   @Output() fecharModal = new EventEmitter<Task | null>();
 
   titulo = '';
@@ -30,14 +30,14 @@ export class NovaTarefaComponent implements OnInit {
 
   categorias: Category[] = [];
   categoriaSelecionadaId?: number;
-
   projetos: ProjetoOption[] = [];
   projetoSelecionadoId?: number;
 
   constructor(
     private tasksService: TasksService,
     private categoriesService: CategoriesService,
-    private projectsService: ProjectsService
+    private projectsService: ProjectsService,
+    private imageService: ImageService // ✅ ADICIONA esta linha
   ) {}
 
   async ngOnInit() {
@@ -66,12 +66,29 @@ export class NovaTarefaComponent implements OnInit {
     this.projetoSelecionadoId = undefined;
   }
 
+  // ✅ ADICIONA este método NOVO
+  async escolherImagem() {
+    const imagem = await this.imageService.pickFromGallery();
+    
+    if (imagem) {
+      this.imagemUrl = imagem;
+      console.log('✅ Imagem selecionada!');
+    }
+  }
+
+  // ✅ ADICIONA este método NOVO
+  removerImagem() {
+    this.imagemUrl = undefined;
+  }
+
+  // ⬇️ O método criar() FICA IGUAL - JÁ GUARDA imagemUrl
   async criar() {
     if (!this.titulo.trim()) {
       return;
     }
 
     const finalProjectId = this.projeto ?? this.projetoSelecionadoId;
+
     if (!finalProjectId) {
       return;
     }
@@ -95,16 +112,16 @@ export class NovaTarefaComponent implements OnInit {
       description: this.descricao.trim() || undefined,
       due_date: dueDate,
       due_time: dueTime,
-      image_url: this.imagemUrl || undefined,
+      image_url: this.imagemUrl || undefined, // ✅ Já estava aqui!
       completed: false
     };
 
     const criada = await this.tasksService.insertTask(novaTask);
-
     // avisa o pai (home / detalhes-projeto)
     this.fecharModal.emit(criada ?? null);
   }
 
+  // ⬇️ Método fechar() FICA IGUAL
   fechar() {
     this.fecharModal.emit(null);
   }

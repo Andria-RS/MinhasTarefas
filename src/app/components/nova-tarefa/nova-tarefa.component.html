@@ -11,16 +11,30 @@
 
 <ion-content fullscreen="true" class="nova-tarefa-content">
 
+  <!-- IMAGEM -->
   <ion-item lines="none">
     <ion-label position="stacked">Imagem da tarefa</ion-label>
-    <ion-button fill="outline" expand="block" color="medium">
+    <ion-button 
+      fill="outline" 
+      expand="block" 
+      color="roxo"
+      (click)="escolherImagem()">
       <ion-icon name="image-outline" slot="start"></ion-icon>
-      <ion-label>Escolher imagem</ion-label>
+      <ion-label>{{ imagemUrl ? 'Mudar imagem' : 'Escolher imagem' }}</ion-label>
     </ion-button>
   </ion-item>
-
-  <ion-item lines="none" class="preview-wrapper">
-    <img src="assets/img/exemplo_tarefa.png" alt="Pré-visualização">
+  <!-- Preview -->
+  <ion-item lines="none" class="preview-wrapper" *ngIf="imagemUrl">
+    <div class="image-container">
+      <img [src]="imagemUrl" alt="Pré-visualização">
+      <ion-button 
+        fill="clear" 
+        color="danger" 
+        class="remove-btn"
+        (click)="removerImagem()">
+        <ion-icon name="close-circle"></ion-icon>
+      </ion-button>
+    </div>
   </ion-item>
 
   <!-- Título -->
