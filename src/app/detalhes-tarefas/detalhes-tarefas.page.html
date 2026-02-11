@@ -152,21 +152,26 @@
           </ion-input>
         </ion-item>
 
-        <!-- Data e Hora -->
         <ion-item lines="full">
           <ion-label position="stacked">Data</ion-label>
-          <ion-datetime-button datetime="dt-editar-tarefa"></ion-datetime-button>
+          <ion-datetime-button datetime="dt-editar-tarefa" color="roxo"></ion-datetime-button>
         </ion-item>
 
-        <ion-popover [keepContentsMounted]="true">
+        <ion-modal [keepContentsMounted]="true">
           <ng-template>
             <ion-datetime
               id="dt-editar-tarefa"
               presentation="date-time"
-              [(ngModel)]="tarefaEditavel.dataLimite">
+              [(ngModel)]="tarefaEditavel.dataLimite"
+              locale="pt-PT"
+              color="roxo"
+              [showDefaultButtons]="true"
+              doneText="OK"
+              cancelText="Cancelar">
             </ion-datetime>
           </ng-template>
-        </ion-popover>
+        </ion-modal>
+
 
         <!-- Descrição -->
         <ion-item lines="full">

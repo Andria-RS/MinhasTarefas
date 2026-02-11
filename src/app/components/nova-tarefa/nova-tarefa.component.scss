@@ -60,3 +60,30 @@
     }
   }
 }
+
+ion-modal {
+  --background: transparent;
+}
+
+ion-datetime {
+  --background: #111;
+  --background-rgb: 17, 17, 17;
+  --title-color: #fff;
+
+  /* cor principal roxa */
+  --ion-color-base: var(--ion-color-roxo);
+  --ion-color-base-rgb: var(--ion-color-roxo-rgb);
+  --ion-color-contrast: #ffffff;
+  --ion-color-contrast-rgb: 255, 255, 255;
+
+  /* seleção dos dias/horas em roxo */
+  --wheel-highlight-background: rgba(167, 139, 250, 0.25);
+  --wheel-highlight-border-radius: 16px;
+  --wheel-fade-background-rgb: 0, 0, 0;
+
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
+  text-transform: capitalize;
+}
+

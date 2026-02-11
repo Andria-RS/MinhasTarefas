@@ -94,7 +94,7 @@
   <!-- Data e Hora -->
   <ion-item lines="full">
     <ion-label position="stacked">Data</ion-label>
-    <ion-datetime-button datetime="dt-tarefa"></ion-datetime-button>
+    <ion-datetime-button datetime="dt-tarefa" color="roxo"></ion-datetime-button>
   </ion-item>
 
   <ion-modal [keepContentsMounted]="true">
@@ -102,10 +102,17 @@
       <ion-datetime
         id="dt-tarefa"
         presentation="date-time"
-        [(ngModel)]="dataLimite">
+        [(ngModel)]="dataLimite"
+        locale="pt-PT"
+        color="roxo"
+        [showDefaultButtons]="true"
+        doneText="OK"
+        cancelText="Cancelar">
       </ion-datetime>
     </ng-template>
   </ion-modal>
+
+
 
   <!-- Descrição -->
   <ion-item lines="full">
