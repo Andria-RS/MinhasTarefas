@@ -25,7 +25,14 @@ export class ProjectsService {
   async getProjectsByCategory(categoryId: number): Promise<Project[]> {
     const { data, error } = await this.supabaseClient
       .from('projects')
-      .select('*')
+      .select(`
+        id,
+        name,
+        description,
+        category_id,
+        status,
+        tasks:tasks(count)
+      `)
       .eq('category_id', categoryId)
       .order('name', { ascending: true });
 
@@ -34,7 +41,14 @@ export class ProjectsService {
       return [];
     }
 
-    return data as Project[];
+    return (data || []).map((p: any) => ({
+      id: p.id,
+      name: p.name,
+      description: p.description,
+      category_id: p.category_id,
+      status: p.status,
+      total_tasks: p.tasks?.[0]?.count ?? 0
+    })) as Project[];
   }
 
   async getProjectById(id: number): Promise<Project | null> {
@@ -66,7 +80,6 @@ export class ProjectsService {
     return data as Project[];
   }
 
-
   async insertProject(project: Project): Promise<Project | null> {
     const { data, error } = await this.supabaseClient
       .from('projects')
@@ -95,7 +108,7 @@ export class ProjectsService {
         name: project.name,
         description: project.description,
         status: project.status,
-        category_id: project.category_id   // <-- linha que faltava
+        category_id: project.category_id   // <-- mantido
       })
       .eq('id', project.id);
 
@@ -104,7 +117,6 @@ export class ProjectsService {
       throw new Error('Erro ao atualizar projeto');
     }
   }
-
 
   async deleteProject(id: number): Promise<void> {
     const { error } = await this.supabaseClient

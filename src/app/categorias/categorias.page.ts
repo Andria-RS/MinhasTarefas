@@ -47,7 +47,7 @@ export class CategoriasPage implements OnInit {
       id: cat.id ?? 0,
       nome: cat.name,
       icon: cat.icon || 'folder-open-outline',
-      totalProjetos: 0 // mais tarde podemos calcular com base na tabela projects
+      totalProjetos: cat.total_projects ?? 0
     };
   }
 
@@ -56,6 +56,7 @@ export class CategoriasPage implements OnInit {
       id: cat.id,
       name: cat.nome,
       icon: cat.icon
+      // total_projects não é guardado na BD, por isso não vai aqui
     };
   }
 

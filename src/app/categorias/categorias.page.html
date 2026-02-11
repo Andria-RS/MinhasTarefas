@@ -29,14 +29,10 @@
 
       <ion-label>
         <h2>{{ cat.nome }}</h2>
-        <p>{{ cat.totalProjetos }} projetos</p>
+        <p>{{ cat.totalProjetos }} Projeto(s)</p>
       </ion-label>
 
-      <ion-button
-        fill="clear"
-        slot="end"
-        (click)="abrirOpcoesCategoria(cat); $event.stopPropagation()"
-      >
+      <ion-button fill="clear" slot="end" (click)="abrirOpcoesCategoria(cat); $event.stopPropagation()">
         <ion-icon name="ellipsis-vertical"></ion-icon>
       </ion-button>
     </ion-item>

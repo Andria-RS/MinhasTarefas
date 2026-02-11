@@ -17,7 +17,12 @@ export class CategoriesService {
   async getAllCategories(): Promise<Category[]> {
     const { data, error } = await this.supabaseClient
       .from('categories')
-      .select('*')
+      .select(`
+        id,
+        name,
+        icon,
+        projects:projects(count)
+      `)
       .order('name', { ascending: true });
 
     if (error) {
@@ -25,7 +30,12 @@ export class CategoriesService {
       return [];
     }
 
-    return data as Category[];
+    return (data || []).map((c: any) => ({
+      id: c.id,
+      name: c.name,
+      icon: c.icon,
+      total_projects: c.projects?.[0]?.count ?? 0
+    })) as Category[];
   }
 
   async getCategoryById(id: number): Promise<Category | null> {
