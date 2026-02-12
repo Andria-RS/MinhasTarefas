@@ -5,30 +5,21 @@
 </ion-header>
 
 <ion-content>
-  <!-- Botão marcar tudo como lido -->
   <div class="actions-bar" *ngIf="notificacoes.length > 0 && naoLidasCount > 0">
-    <ion-button 
-      fill="clear" 
-      color="roxo" 
-      (click)="marcarTodasComoLidas()">
+    <ion-button fill="clear" color="roxo" (click)="marcarTodasComoLidas()">
       <ion-icon slot="start" name="checkmark-done-outline"></ion-icon>
       Marcar tudo como lido
     </ion-button>
   </div>
 
-  <!-- Estado vazio -->
   <div *ngIf="notificacoes.length === 0" class="empty-state">
     <ion-icon name="notifications-off-outline" class="empty-icon"></ion-icon>
     <p>Sem notificações</p>
   </div>
 
-  <!-- Lista de notificações -->
   <ion-list *ngIf="notificacoes.length > 0">
     <ion-item-sliding *ngFor="let notif of notificacoes" #slidingItem>
-      <ion-item 
-        [class.nao-lida]="!notif.lida" 
-        (click)="abrirTarefa(notif)"
-        lines="full">
+      <ion-item  [class.nao-lida]="!notif.lida"  (click)="abrirTarefa(notif)" lines="full">
         <div class="notificacao-content">
           <div class="notificacao-header">
             <h3>{{ notif.titulo }}</h3>
@@ -48,14 +39,11 @@
         </div>
       </ion-item>
 
-      <!-- Swipe para a esquerda - Marcar como lida -->
       <ion-item-options side="start">
         <ion-item-option color="roxo" (click)="marcarComoLida(notif, slidingItem)">
           <ion-icon slot="icon-only" name="checkmark-circle"></ion-icon>
         </ion-item-option>
       </ion-item-options>
-
-      <!-- Swipe para a direita - Apagar -->
       <ion-item-options side="end">
         <ion-item-option color="danger" (click)="apagarNotificacao(notif, slidingItem)">
           <ion-icon slot="icon-only" name="trash"></ion-icon>

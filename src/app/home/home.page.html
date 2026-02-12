@@ -19,11 +19,9 @@
       (didDismiss)="onModalDismiss($event)"
       class="sheet-modal"
       [breakpoints]="[0, 1]"
-      [initialBreakpoint]="1"
-    >
+      [initialBreakpoint]="1">
       <ng-template>
-        <app-nova-tarefa
-          (fecharModal)="onNovaTarefaFechar($event)">
+        <app-nova-tarefa (fecharModal)="onNovaTarefaFechar($event)">
         </app-nova-tarefa>
       </ng-template>
     </ion-modal>
@@ -45,10 +43,7 @@
   </ion-segment>
 
   <ng-container *ngFor="let tarefa of tarefas">
-    <app-cartoes-tarefas
-      *ngIf="tarefa.tipo === filtro"
-      [tarefa]="tarefa"
-      (abrirDetalhes)="abrirDetalhesTarefas($event)">
+    <app-cartoes-tarefas *ngIf="tarefa.tipo === filtro" [tarefa]="tarefa" (abrirDetalhes)="abrirDetalhesTarefas($event)">
     </app-cartoes-tarefas>
   </ng-container>
 </ion-content>

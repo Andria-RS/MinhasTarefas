@@ -10,34 +10,20 @@
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <!-- Search -->
   <ion-item lines="none">
-    <ion-searchbar
-      placeholder="Filtrar projetos"
-      (ionInput)="filtrarProjetos($event)">
+    <ion-searchbar placeholder="Filtrar projetos" (ionInput)="filtrarProjetos($event)">
     </ion-searchbar>
   </ion-item>
 
-  <!-- Lista de projetos -->
   <ion-list>
-    <ion-item
-      *ngFor="let proj of projetos"
-      class="projeto-item"
-      button
-      (click)="abrirDetalhe(proj)"
-    >
+    <ion-item *ngFor="let proj of projetos" class="projeto-item" button (click)="abrirDetalhe(proj)">
       <ion-label>
         <h2>{{ proj.nome }}</h2>
         <p>{{ proj.descricao }}</p>
         <p>{{ proj.totalTarefas }} Tarefa(s)</p>
       </ion-label>
 
-      <!-- zona direita: badge -->
-      <div
-        slot="end"
-        class="end-wrapper"
-        (click)="$event.stopPropagation()"
-      >
+      <div slot="end" class="end-wrapper" (click)="$event.stopPropagation()">
         <ion-badge *ngIf="proj.estado === 'por-fazer'" color="azul">
           Por fazer
         </ion-badge>
@@ -48,21 +34,18 @@
     </ion-item>
   </ion-list>
 
-  <!-- Botão + no fundo para novo projeto -->
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">
     <ion-fab-button color="roxo" (click)="abrirNovoProjeto()">
       <ion-icon name="add"></ion-icon>
     </ion-fab-button>
   </ion-fab>
 
-  <!-- Sheet modal: Novo / Editar projeto -->
   <ion-modal
     [isOpen]="isModalProjetoAberto"
     (didDismiss)="fecharNovoProjeto()"
     class="sheet-modal projeto-modal"
     [breakpoints]="[0, 0.9, 1]"
-    [initialBreakpoint]="0.9"
-  >
+    [initialBreakpoint]="0.9">
     <ng-template>
       <ion-header translucent>
         <ion-toolbar color="roxo">
@@ -80,34 +63,24 @@
       <ion-content class="projeto-modal-content">
         <form [formGroup]="formProjeto" (ngSubmit)="guardarProjeto()">
 
-          <!-- Título -->
           <ion-item lines="none">
             <ion-label position="stacked">Título</ion-label>
-            <ion-input
-              placeholder="Ex: Estudar X"
-              formControlName="nome">
+            <ion-input placeholder="Ex: Estudar X" formControlName="nome">
             </ion-input>
           </ion-item>
-          <ion-text color="danger"
-                    *ngIf="formProjeto.get('nome')?.invalid && formProjeto.get('nome')?.touched">
+          <ion-text color="danger" *ngIf="formProjeto.get('nome')?.invalid && formProjeto.get('nome')?.touched">
             <small>Título é obrigatório.</small>
           </ion-text>
 
-          <!-- Descrição -->
           <ion-item lines="none">
             <ion-label position="stacked">Descrição</ion-label>
-            <ion-textarea
-              autoGrow="true"
-              placeholder="Escreve aqui os detalhes do projeto..."
-              formControlName="descricao">
+            <ion-textarea autoGrow="true" placeholder="Escreve aqui os detalhes do projeto..." formControlName="descricao">
             </ion-textarea>
           </ion-item>
-          <ion-text color="danger"
-                    *ngIf="formProjeto.get('descricao')?.invalid && formProjeto.get('descricao')?.touched">
+          <ion-text color="danger" *ngIf="formProjeto.get('descricao')?.invalid && formProjeto.get('descricao')?.touched">
             <small>Descrição é obrigatória.</small>
           </ion-text>
 
-          <!-- Categoria (só visual, preenchida automaticamente) -->
           <ion-item lines="none" disabled="true">
             <ion-label>
               <h2>Categoria</h2>
@@ -115,15 +88,9 @@
             </ion-label>
           </ion-item>
 
-          <ion-button
-            expand="block"
-            color="roxo"
-            class="btn-guardar-projeto"
-            type="submit"
-            [disabled]="formProjeto.invalid">
+          <ion-button expand="block" color="roxo" class="btn-guardar-projeto" type="submit" [disabled]="formProjeto.invalid">
             {{ projetoEmEdicao ? 'Guardar alterações' : 'Criar projeto' }}
           </ion-button>
-
         </form>
       </ion-content>
     </ng-template>

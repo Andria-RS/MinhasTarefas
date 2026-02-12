@@ -11,8 +11,7 @@
     <ion-buttons slot="end">
       <ion-button
         fill="clear"
-        (click)="abrirOpcoesTarefa(); $event.stopPropagation()"
-      >
+        (click)="abrirOpcoesTarefa(); $event.stopPropagation()">
         <ion-icon name="ellipsis-vertical"></ion-icon>
       </ion-button>
     </ion-buttons>
@@ -20,18 +19,15 @@
 </ion-header>
 
 <ion-content [fullscreen]="true" *ngIf="tarefa">
-  <!-- Imagem da tarefa -->
   <ion-card class="tarefa-img-card">
     <ion-img [src]="tarefa.imagemUrl" alt="Imagem da tarefa"></ion-img>
   </ion-card>
 
-  <!-- Título -->
   <ion-item lines="full">
     <ion-label position="stacked">Título</ion-label>
     <ion-input [value]="tarefa.titulo" readonly="true"></ion-input>
   </ion-item>
 
-  <!-- Data / Hora -->
   <ion-grid>
     <ion-row>
       <ion-col size="7">
@@ -40,7 +36,6 @@
           <ion-input [value]="tarefa.dataData" readonly="true"></ion-input>
         </ion-item>
       </ion-col>
-
       <ion-col size="5">
         <ion-item lines="full">
           <ion-label position="stacked">Hora</ion-label>
@@ -50,17 +45,12 @@
     </ion-row>
   </ion-grid>
 
-  <!-- Descrição -->
   <ion-item lines="full">
     <ion-label position="stacked">Descrição</ion-label>
-    <ion-textarea
-      auto-grow="true"
-      [value]="tarefa.descricao"
-      readonly="true">
+    <ion-textarea auto-grow="true" [value]="tarefa.descricao" readonly="true">
     </ion-textarea>
   </ion-item>
 
-  <!-- Categoria -->
   <ion-item lines="full">
     <ion-label position="stacked">Categoria</ion-label>
     <ion-select [value]="tarefa.categoria" interface="popover" disabled="true">
@@ -70,13 +60,11 @@
     </ion-select>
   </ion-item>
 
-  <!-- Projeto -->
   <ion-item lines="full">
     <ion-label position="stacked">Projeto</ion-label>
     <ion-input [value]="tarefa.projetoNome" readonly="true"></ion-input>
   </ion-item>
 
-  <!-- Estado -->
   <ion-item lines="full">
     <ion-label position="stacked">Estado</ion-label>
     <ion-select [value]="tarefa.estado" interface="popover" disabled="true">
@@ -86,14 +74,12 @@
     </ion-select>
   </ion-item>
 
-  <!-- SHEET EDITAR TAREFA -->
   <ion-modal
     [isOpen]="isModalEditarAberto"
     (didDismiss)="fecharEditarTarefa()"
     class="sheet-modal"
     [breakpoints]="[0, 1]"
-    [initialBreakpoint]="1"
-  >
+    [initialBreakpoint]="1">
     <ng-template>
       <ion-header>
         <ion-toolbar color="roxo">
@@ -109,7 +95,6 @@
       <ion-content fullscreen="true" class="editar-tarefa-content">
         <form [formGroup]="formEditar" (ngSubmit)="guardarEditarTarefa()">
 
-          <!-- Imagem -->
           <ion-item lines="none">
             <ion-label position="stacked">Imagem da tarefa</ion-label>
             <ion-button 
@@ -122,44 +107,27 @@
                 {{ formEditar.get('imagemUrl')?.value ? 'Mudar imagem' : 'Escolher imagem' }}
               </ion-label>
             </ion-button>
-
-            <input 
-              type="file" 
-              accept="image/*" 
-              (change)="onImageSelectedEditar($event)" 
-              #fileInputEditar 
-              style="display: none">
+            <input type="file"  accept="image/*"  (change)="onImageSelectedEditar($event)"  #fileInputEditar  style="display: none">
           </ion-item>
 
-          <!-- Preview -->
-          <ion-item lines="none" class="preview-wrapper-editar"
-                    *ngIf="formEditar.get('imagemUrl')?.value">
+          <ion-item lines="none" class="preview-wrapper-editar" *ngIf="formEditar.get('imagemUrl')?.value">
             <div class="image-container">
               <img [src]="formEditar.get('imagemUrl')?.value" alt="Pré-visualização">
-              <ion-button 
-                fill="clear" 
-                color="danger" 
-                class="remove-image-btn"
-                (click)="removerImagemEditar()">
+              <ion-button fill="clear" color="danger" class="remove-image-btn" (click)="removerImagemEditar()">
                 <ion-icon name="close-circle"></ion-icon>
               </ion-button>
             </div>
           </ion-item>
 
-          <!-- Título -->
           <ion-item lines="none">
             <ion-label position="stacked">Título</ion-label>
-            <ion-input
-              placeholder="Ex: Fazer exercícios X"
-              formControlName="titulo">
+            <ion-input placeholder="Ex: Fazer exercícios X" formControlName="titulo">
             </ion-input>
           </ion-item>
-          <ion-text color="danger"
-                    *ngIf="formEditar.get('titulo')?.invalid && formEditar.get('titulo')?.touched">
+          <ion-text color="danger" *ngIf="formEditar.get('titulo')?.invalid && formEditar.get('titulo')?.touched">
             <small>Título é obrigatório.</small>
           </ion-text>
 
-          <!-- Data -->
           <ion-item lines="none">
             <ion-label position="stacked">Data</ion-label>
             <ion-datetime-button datetime="dt-editar-tarefa" color="roxo"></ion-datetime-button>
@@ -178,59 +146,43 @@
               </ion-datetime>
             </ng-template>
           </ion-modal>
-          <ion-text color="danger"
-                    *ngIf="formEditar.get('dataLimite')?.invalid && formEditar.get('dataLimite')?.touched">
+          <ion-text color="danger" *ngIf="formEditar.get('dataLimite')?.invalid && formEditar.get('dataLimite')?.touched">
             <small>Data é obrigatória.</small>
           </ion-text>
 
-          <!-- Descrição -->
           <ion-item lines="none">
             <ion-label position="stacked">Descrição</ion-label>
-            <ion-textarea
-              auto-grow="true"
-              placeholder="Escreve aqui os detalhes da tarefa..."
-              formControlName="descricao">
+            <ion-textarea auto-grow="true" placeholder="Escreve aqui os detalhes da tarefa..." formControlName="descricao">
             </ion-textarea>
           </ion-item>
-          <ion-text color="danger"
-                    *ngIf="formEditar.get('descricao')?.invalid && formEditar.get('descricao')?.touched">
+          <ion-text color="danger" *ngIf="formEditar.get('descricao')?.invalid && formEditar.get('descricao')?.touched">
             <small>Descrição é obrigatória.</small>
           </ion-text>
 
-          <!-- Categoria -->
           <ion-item lines="none">
             <ion-label position="stacked">Categoria</ion-label>
-            <ion-select
-              placeholder="Selecionar categoria"
-              formControlName="categoriaId"
-              (ionChange)="onCategoriaChangeEditar()">
+            <ion-select placeholder="Selecionar categoria" formControlName="categoriaId" (ionChange)="onCategoriaChangeEditar()">
               <ion-select-option *ngFor="let c of categorias" [value]="c.id">
                 {{ c.name }}
               </ion-select-option>
             </ion-select>
           </ion-item>
-          <ion-text color="danger"
-                    *ngIf="formEditar.get('categoriaId')?.invalid && formEditar.get('categoriaId')?.touched">
+          <ion-text color="danger" *ngIf="formEditar.get('categoriaId')?.invalid && formEditar.get('categoriaId')?.touched">
             <small>Categoria é obrigatória.</small>
           </ion-text>
 
-          <!-- Projeto -->
           <ion-item lines="none">
             <ion-label position="stacked">Projeto</ion-label>
-            <ion-select
-              placeholder="Selecionar projeto"
-              formControlName="projetoId">
+            <ion-select placeholder="Selecionar projeto" formControlName="projetoId">
               <ion-select-option *ngFor="let p of projetos" [value]="p.id">
                 {{ p.nome }}
               </ion-select-option>
             </ion-select>
           </ion-item>
-          <ion-text color="danger"
-                    *ngIf="formEditar.get('projetoId')?.invalid && formEditar.get('projetoId')?.touched">
+          <ion-text color="danger" *ngIf="formEditar.get('projetoId')?.invalid && formEditar.get('projetoId')?.touched">
             <small>Projeto é obrigatório.</small>
           </ion-text>
 
-          <!-- Estado -->
           <ion-item lines="none">
             <ion-label position="stacked">Estado</ion-label>
             <ion-select formControlName="estado">
@@ -238,23 +190,15 @@
               <ion-select-option value="feito">Feito</ion-select-option>
             </ion-select>
           </ion-item>
-          <ion-text color="danger"
-                    *ngIf="formEditar.get('estado')?.invalid && formEditar.get('estado')?.touched">
+          <ion-text color="danger" *ngIf="formEditar.get('estado')?.invalid && formEditar.get('estado')?.touched">
             <small>Estado é obrigatório.</small>
           </ion-text>
 
-          <!-- Botão Guardar -->
-          <ion-button
-            expand="block"
-            color="roxo"
-            class="btn-guardar-editar"
-            type="submit"
-            [disabled]="formEditar.invalid">
+          <ion-button expand="block" color="roxo" class="btn-guardar-editar" type="submit" [disabled]="formEditar.invalid">
             Guardar alterações
           </ion-button>
         </form>
       </ion-content>
     </ng-template>
   </ion-modal>
-
 </ion-content>

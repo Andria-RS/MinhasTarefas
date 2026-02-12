@@ -6,7 +6,7 @@
 
 <ion-content [fullscreen]="true">
   <div class="cal-wrapper">
-    <!-- Calendário mensal com destaque para dias com tarefas -->
+    <!-- Calendário mensal -->
     <ion-datetime
       #datetime
       presentation="date"
@@ -35,10 +35,7 @@
 
       <!-- Lista de cards de tarefas -->
       <ion-list lines="none" *ngIf="tarefasDoDia.length > 0">
-        <app-cartoes-tarefas
-          *ngFor="let tarefa of tarefasDoDia"
-          [tarefa]="tarefa"
-          (abrirDetalhes)="abrirDetalhesTarefa($event)">
+        <app-cartoes-tarefas *ngFor="let tarefa of tarefasDoDia" [tarefa]="tarefa" (abrirDetalhes)="abrirDetalhesTarefa($event)">
         </app-cartoes-tarefas>
       </ion-list>
     </div>

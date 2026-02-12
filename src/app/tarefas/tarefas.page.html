@@ -17,23 +17,15 @@
   <form #form="ngForm" (ngSubmit)="onSubmit(form)">
     <ion-item>
       <ion-label position="stacked">Título</ion-label>
-        <ion-input
-          ngModel
-          name="title"
-          required
-          placeholder="Insira o título da tarefa">
+        <ion-input ngModel name="title" required placeholder="Insira o título da tarefa">
         </ion-input>
     </ion-item>
 
     <ion-item>
       <ion-label position="stacked">Descrição</ion-label>
-      <ion-input
-        ngModel
-        name="description"
-        required
-        placeholder="Insira a descrição da tarefa">
+      <ion-input ngModel name="description" required placeholder="Insira a descrição da tarefa">
       </ion-input>
-  </ion-item>
+    </ion-item>
 
   <ion-button type="button" expand="block" color="primary" (click)="takePicture()">
     Adicionar Foto
@@ -42,11 +34,7 @@
     <img [src]="photo" style="width:100%;max-width:200px;margin-top:10px;">
   </div>
 
-  <ion-button
-    expand="block"
-    color="success"
-    [disabled]="form.invalid"
-    type="submit">
+  <ion-button expand="block" color="success" [disabled]="form.invalid" type="submit">
     Guardar
   </ion-button>
 </form>

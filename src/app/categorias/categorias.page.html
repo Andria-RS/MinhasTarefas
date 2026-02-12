@@ -5,23 +5,13 @@
 </ion-header>
 
 <ion-content [fullscreen]="true">
-
-  <!-- Barra de pesquisa -->
   <ion-item lines="none">
-    <ion-searchbar
-      placeholder="Filtrar categorias"
-      (ionInput)="filtrarCategorias($event)">
+    <ion-searchbar placeholder="Filtrar categorias" (ionInput)="filtrarCategorias($event)">
     </ion-searchbar>
   </ion-item>
 
-  <!-- Lista de categorias -->
   <ion-list lines="none">
-    <ion-item
-      *ngFor="let cat of categorias"
-      class="categoria-item"
-      button
-      (click)="abrirProjetos(cat)"
-    >
+    <ion-item *ngFor="let cat of categorias" class="categoria-item" button (click)="abrirProjetos(cat)">
       <ion-avatar slot="start">
         <ion-icon [name]="cat.icon"></ion-icon>
       </ion-avatar>
@@ -31,30 +21,24 @@
         <p>{{ cat.totalProjetos }} Projeto(s)</p>
       </ion-label>
 
-      <ion-button
-        fill="clear"
-        slot="end"
-        (click)="abrirOpcoesCategoria(cat); $event.stopPropagation()">
+      <ion-button fill="clear" slot="end" (click)="abrirOpcoesCategoria(cat); $event.stopPropagation()">
         <ion-icon name="ellipsis-vertical"></ion-icon>
       </ion-button>
     </ion-item>
   </ion-list>
 
-  <!-- Botão + para nova categoria -->
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">
     <ion-fab-button color="roxo" (click)="abrirNovaCategoria()">
       <ion-icon name="add"></ion-icon>
     </ion-fab-button>
   </ion-fab>
 
-  <!-- Modal Nova/Editar categoria -->
   <ion-modal
     [isOpen]="isModalCategoriaAberto"
     (didDismiss)="fecharNovaCategoria()"
     class="sheet-modal"
     [breakpoints]="[0, 1]"
-    [initialBreakpoint]="1"
-  >
+    [initialBreakpoint]="1">
     <ng-template>
       <ion-header translucent>
         <ion-toolbar>
@@ -71,13 +55,11 @@
 
       <ion-content class="categoria-modal-content">
         <form [formGroup]="formCategoria" (ngSubmit)="guardarNovaCategoria()">
-
           <ion-item lines="none">
             <ion-label position="stacked">Nome</ion-label>
             <ion-input placeholder="Ex: Escola" formControlName="nome"></ion-input>
           </ion-item>
-          <ion-text color="danger"
-                    *ngIf="formCategoria.get('nome')?.invalid && formCategoria.get('nome')?.touched">
+          <ion-text color="danger" *ngIf="formCategoria.get('nome')?.invalid && formCategoria.get('nome')?.touched">
             <small>Nome é obrigatório.</small>
           </ion-text>
 
@@ -85,20 +67,13 @@
             <ion-label position="stacked">Ícone</ion-label>
             <ion-input placeholder="Ex: school" formControlName="icon"></ion-input>
           </ion-item>
-          <ion-text color="danger"
-                    *ngIf="formCategoria.get('icon')?.invalid && formCategoria.get('icon')?.touched">
+          <ion-text color="danger" *ngIf="formCategoria.get('icon')?.invalid && formCategoria.get('icon')?.touched">
             <small>Ícone é obrigatório.</small>
           </ion-text>
 
-          <ion-button
-            expand="block"
-            color="roxo"
-            type="submit"
-            class="btn-guardar-categoria"
-            [disabled]="formCategoria.invalid">
+          <ion-button expand="block" color="roxo" type="submit" class="btn-guardar-categoria" [disabled]="formCategoria.invalid">
             {{ categoriaEmEdicao ? 'Guardar alterações' : 'Criar categoria' }}
           </ion-button>
-
         </form>
       </ion-content>
     </ng-template>
