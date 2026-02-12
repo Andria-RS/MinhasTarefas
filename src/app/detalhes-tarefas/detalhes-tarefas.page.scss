@@ -16,23 +16,56 @@
   --border-radius: 16px 16px 0 0;
 }
 
-/* Estilos da sheet de EDITAR (separados da “Nova tarefa”) */
+/* Estilos do modal EDITAR */
 .editar-tarefa-content {
   --background: #000;
   background: #000;
   color: #fff;
 
+  form {
+    max-width: 420px;
+    margin: 0 auto;
+    padding: 0 20px 12px;
+  }
+
   ion-item {
-    --background: transparent;
+    --background: #111;
     --color: #fff;
+    --border-radius: 12px;
+    --border-width: 1px;
+    --border-color: #333;
+    --inner-padding-start: 12px;
+    --inner-padding-end: 12px;
+    margin: 14px 0 4px;
+  }
+
+  ion-label[position="stacked"] {
+    font-weight: 700;
+    font-size: 0.95rem;
+    margin-bottom: 6px;
   }
 
   ion-input,
-  ion-textarea {
+  ion-textarea,
+  ion-select {
     --color: #fff;
+    --padding-start: 0;
+    --padding-end: 0;
   }
 
-  /* Estilo do datetime dentro da sheet de editar (igual ao Nova tarefa) */
+  .btn-guardar-editar {
+    margin: 24px 0 8px;
+    border-radius: 999px;
+    width: 100%;
+    font-weight: 600;
+  }
+
+  ion-text[color="danger"] {
+    display: block;
+    margin: 0 0 0 4px;
+    font-size: 0.75rem;
+  }
+
   ion-modal {
     --background: transparent;
   }
@@ -41,38 +74,25 @@
     --background: #111;
     --background-rgb: 17, 17, 17;
     --title-color: #fff;
-
-    /* usar a cor roxa global da app */
     --ion-color-base: var(--ion-color-roxo);
     --ion-color-base-rgb: var(--ion-color-roxo-rgb);
     --ion-color-contrast: #ffffff;
     --ion-color-contrast-rgb: 255, 255, 255;
-
     --wheel-highlight-background: rgba(167, 139, 250, 0.25);
     --wheel-highlight-border-radius: 16px;
     --wheel-fade-background-rgb: 0, 0, 0;
-
     border-radius: 16px;
     overflow: hidden;
     box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
   }
 }
 
-.preview-wrapper-editar img {
-  width: 100%;
-  display: block;
-}
-
-.btn-guardar-editar {
-  margin-top: 16px;
-}
-
+/* preview imagem */
 .preview-wrapper-editar {
   margin-top: 8px;
   margin-bottom: 16px;
   border-radius: 12px;
   overflow: hidden;
-
   --padding-start: 0;
   --padding-end: 0;
   --inner-padding-start: 16px;
@@ -102,4 +122,10 @@
       height: 40px;
     }
   }
+}
+
+/* labels dos campos de detalhes (fora do modal) */
+ion-content ion-item ion-label[position="stacked"] {
+  font-weight: 700;
+  font-size: 1rem;
 }

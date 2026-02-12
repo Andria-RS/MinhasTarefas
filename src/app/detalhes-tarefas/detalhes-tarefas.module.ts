@@ -1,8 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
-
 import { DetalhesTarefasPageRoutingModule } from './detalhes-tarefas-routing.module';
 import { DetalhesTarefasPage } from './detalhes-tarefas.page';
 
@@ -11,7 +10,8 @@ import { DetalhesTarefasPage } from './detalhes-tarefas.page';
     CommonModule,
     FormsModule,
     IonicModule,
-    DetalhesTarefasPageRoutingModule
+    DetalhesTarefasPageRoutingModule,
+    ReactiveFormsModule
   ],
   declarations: [DetalhesTarefasPage]
 })

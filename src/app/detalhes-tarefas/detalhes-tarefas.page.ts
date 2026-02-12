@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { OpcoesService } from '../services/opcoes';
 import { TasksService } from '../services/tasks.service';
 import { Task } from '../services/task';
@@ -42,7 +43,9 @@ export class DetalhesTarefasPage implements OnInit {
 
   categorias: Category[] = [];
   projetos: { id: number; nome: string }[] = [];
-  
+
+  formEditar!: FormGroup;
+
   private origemNavegacao: string = '';
   private origemProjectId?: number;
 
@@ -53,13 +56,14 @@ export class DetalhesTarefasPage implements OnInit {
     private tasksService: TasksService,
     private projectsService: ProjectsService,
     private categoriesService: CategoriesService,
-    private notificacoesService: NotificacoesService
+    private notificacoesService: NotificacoesService,
+    private fb: FormBuilder
   ) {}
 
   async ngOnInit() {
     const idParam = this.route.snapshot.paramMap.get('tarefaId');
     this.tarefaId = idParam ? +idParam : 0;
-    
+
     if (!this.tarefaId) {
       this.router.navigate(['/tabs/home'], { replaceUrl: true });
       return;
@@ -68,8 +72,6 @@ export class DetalhesTarefasPage implements OnInit {
     this.origemNavegacao = this.route.snapshot.queryParamMap.get('from') || '';
     const projId = this.route.snapshot.queryParamMap.get('projectId');
     this.origemProjectId = projId ? +projId : undefined;
-
-    console.log('🔍 Detalhes-Tarefas: origem =', this.origemNavegacao, 'projectId =', this.origemProjectId);
 
     this.categorias = await this.categoriesService.getAllCategories();
     await this.carregarTarefa();
@@ -108,14 +110,15 @@ export class DetalhesTarefasPage implements OnInit {
 
         if (project.category_id) {
           categoriaId = project.category_id;
-          
+
           const categoria: Category | null =
             await this.categoriesService.getCategoryById(project.category_id);
           if (categoria) {
             categoriaNome = categoria.name;
           }
 
-          const projetosMesmaCategoria = await this.projectsService.getProjectsByCategory(project.category_id);
+          const projetosMesmaCategoria =
+            await this.projectsService.getProjectsByCategory(project.category_id);
           this.projetos = projetosMesmaCategoria.map(p => ({
             id: p.id ?? 0,
             nome: p.name
@@ -177,21 +180,30 @@ export class DetalhesTarefasPage implements OnInit {
       return;
     }
     this.tarefa = await this.mapTaskToDetalhe(task);
+
+    // inicializar/atualizar reactive form
+    this.formEditar = this.fb.group({
+      titulo: [this.tarefa.titulo, Validators.required],
+      dataLimite: [this.tarefa.dataLimite || null, Validators.required],
+      descricao: [this.tarefa.descricao, Validators.required],
+      categoriaId: [this.tarefa.categoriaId || null, Validators.required],
+      projetoId: [this.tarefa.projetoId || null, Validators.required],
+      estado: [this.tarefa.estado, Validators.required],
+      imagemUrl: [this.tarefa.imagemUrl]
+    });
   }
 
   voltarParaOrigem() {
-    console.log('⬅️ Voltar para origem:', this.origemNavegacao);
-    
     if (this.origemNavegacao === 'project' && this.origemProjectId) {
-      this.router.navigate(['/detalhes-projeto', this.origemProjectId], { 
+      this.router.navigate(['/detalhes-projeto', this.origemProjectId], {
         queryParams: { _reload: Date.now() }
       });
     } else if (this.origemNavegacao === 'calendar') {
-      this.router.navigate(['/tabs/calendar'], { 
+      this.router.navigate(['/tabs/calendar'], {
         queryParams: { _reload: Date.now() }
       });
     } else {
-      this.router.navigate(['/tabs/home'], { 
+      this.router.navigate(['/tabs/home'], {
         queryParams: { _reload: Date.now() }
       });
     }
@@ -203,24 +215,18 @@ export class DetalhesTarefasPage implements OnInit {
       this.tarefa.titulo,
       () => this.abrirEditarTarefa(),
       async () => {
-        console.log('🗑️ A apagar tarefa', this.tarefaId);
         await this.tasksService.deleteTask(this.tarefaId);
-        
-        console.log('⬅️ A voltar para origem:', this.origemNavegacao);
-        
+
         if (this.origemNavegacao === 'project' && this.origemProjectId) {
-          console.log(' → detalhes-projeto', this.origemProjectId);
-          this.router.navigate(['/detalhes-projeto', this.origemProjectId], { 
+          this.router.navigate(['/detalhes-projeto', this.origemProjectId], {
             queryParams: { _reload: Date.now() }
           });
         } else if (this.origemNavegacao === 'calendar') {
-          console.log(' → calendar');
-          this.router.navigate(['/tabs/calendar'], { 
+          this.router.navigate(['/tabs/calendar'], {
             queryParams: { _reload: Date.now() }
           });
         } else {
-          console.log(' → home');
-          this.router.navigate(['/tabs/home'], { 
+          this.router.navigate(['/tabs/home'], {
             queryParams: { _reload: Date.now() }
           });
         }
@@ -230,6 +236,19 @@ export class DetalhesTarefasPage implements OnInit {
 
   abrirEditarTarefa() {
     this.tarefaEditavel = { ...this.tarefa };
+
+    if (this.formEditar) {
+      this.formEditar.setValue({
+        titulo: this.tarefa.titulo,
+        dataLimite: this.tarefa.dataLimite || null,
+        descricao: this.tarefa.descricao,
+        categoriaId: this.tarefa.categoriaId || null,
+        projetoId: this.tarefa.projetoId || null,
+        estado: this.tarefa.estado,
+        imagemUrl: this.tarefa.imagemUrl
+      });
+    }
+
     this.isModalEditarAberto = true;
   }
 
@@ -238,39 +257,67 @@ export class DetalhesTarefasPage implements OnInit {
   }
 
   async onCategoriaChangeEditar() {
-    if (!this.tarefaEditavel.categoriaId) {
+    const categoriaId = this.formEditar.get('categoriaId')?.value;
+    if (!categoriaId) {
       this.projetos = [];
-      this.tarefaEditavel.projetoId = 0;
+      this.formEditar.get('projetoId')?.setValue(null);
       return;
     }
 
-    const data = await this.projectsService.getProjectsByCategory(this.tarefaEditavel.categoriaId);
+    const data = await this.projectsService.getProjectsByCategory(categoriaId);
     this.projetos = data.map(p => ({
       id: p.id ?? 0,
       nome: p.name
     }));
 
-    this.tarefaEditavel.projetoId = 0;
+    this.formEditar.get('projetoId')?.setValue(null);
   }
 
-  // ✅ NOVA FUNÇÃO: Seleção de imagem no modal de edição
   onImageSelectedEditar(event: any) {
     const file = event.target.files[0];
     if (file) {
       const reader = new FileReader();
       reader.onload = () => {
-        this.tarefaEditavel.imagemUrl = reader.result as string;
+        const url = reader.result as string;
+        this.formEditar.get('imagemUrl')?.setValue(url);
+        if (this.tarefaEditavel) {
+          this.tarefaEditavel.imagemUrl = url;
+        }
       };
       reader.readAsDataURL(file);
     }
   }
 
   removerImagemEditar() {
-    this.tarefaEditavel.imagemUrl = '';
+    this.formEditar.get('imagemUrl')?.setValue('');
+    if (this.tarefaEditavel) {
+      this.tarefaEditavel.imagemUrl = '';
+    }
   }
 
   async guardarEditarTarefa() {
-    // atualizar campos de data/hora no objeto de detalhe
+    if (this.formEditar.invalid) {
+      this.formEditar.markAllAsTouched();
+      return;
+    }
+
+    const v = this.formEditar.value;
+
+    this.tarefaEditavel = {
+      ...this.tarefaEditavel,
+      titulo: v.titulo,
+      dataLimite: v.dataLimite,
+      descricao: v.descricao,
+      categoriaId: v.categoriaId,
+      projetoId: v.projetoId,
+      estado: v.estado,
+      imagemUrl: v.imagemUrl || this.tarefaEditavel.imagemUrl,
+      dataData: '',
+      dataHora: '',
+      categoria: this.tarefa.categoria, // será recalculado se precisares
+      projetoNome: this.tarefa.projetoNome
+    };
+
     if (this.tarefaEditavel.dataLimite) {
       const d = new Date(this.tarefaEditavel.dataLimite);
       this.tarefaEditavel.dataData = d.toLocaleDateString('pt-PT');
@@ -280,31 +327,23 @@ export class DetalhesTarefasPage implements OnInit {
       });
     }
 
-    // transformar DetalheTarefa -> Task
     const taskToUpdate = this.mapDetalheToTask(this.tarefaEditavel);
 
-    // 1) atualizar tarefa na BD
     await this.tasksService.updateTask(taskToUpdate);
 
-    // 2) atualizar notificações locais (1 dia antes + 1 hora antes)
     if (taskToUpdate.id && taskToUpdate.due_date) {
       const iso = taskToUpdate.due_time
         ? `${taskToUpdate.due_date}T${taskToUpdate.due_time}`
         : `${taskToUpdate.due_date}T09:00:00`;
 
-      // cancelar notificações antigas desta tarefa
       await this.notificacoesService.cancelarDaTarefa(taskToUpdate.id);
-
-      // agendar novamente com a nova data/hora
       await this.notificacoesService.agendarParaTarefa(
         taskToUpdate.id,
         taskToUpdate.title,
         iso
       );
 
-      // 3) atualizar notificação na tabela notifications
       const supabase = getSupabase();
-
       const mensagem = construirMensagemNotificacao(
         taskToUpdate.title,
         taskToUpdate.due_date,
@@ -312,7 +351,6 @@ export class DetalhesTarefasPage implements OnInit {
       );
       const hora = taskToUpdate.due_time ?? '09:00:00';
 
-      // se já existir uma notificação para esta tarefa, atualiza; senão cria
       await supabase.from('notifications')
         .upsert(
           {
@@ -327,13 +365,7 @@ export class DetalhesTarefasPage implements OnInit {
         );
     }
 
-    // fechar modal e recarregar detalhes
     this.fecharEditarTarefa();
     await this.carregarTarefa();
-
-    console.log('💾 Tarefa guardada, notificações atualizadas.');
   }
-
 }
-
-
