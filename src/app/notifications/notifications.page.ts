@@ -10,8 +10,8 @@ interface Notificacao {
   tarefa_id: number;
   titulo: string;
   mensagem: string;
-  data: string;  // data em que a notificação foi criada/recebida
-  hora: string;  // hora em que a notificação foi criada/recebida
+  data: string;
+  hora: string;
   lida: boolean;
 }
 
@@ -55,9 +55,8 @@ export class NotificationsPage implements OnInit {
         tarefa_id: n.tarefa_id,
         titulo: n.titulo,
         mensagem: n.mensagem,
-        // usar created_at como data/hora da notificação
-        data: n.created_at.slice(0, 10),   // 'YYYY-MM-DD'
-        hora: n.created_at.slice(11, 16),  // 'HH:MM'
+        data: n.created_at.slice(0, 10),
+        hora: n.created_at.slice(11, 16),
         lida: n.lida,
       }));
     }

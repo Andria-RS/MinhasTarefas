@@ -14,9 +14,7 @@ export class NotificacoesService {
 
     const agora = new Date();
 
-    // 1 dia antes
     const umDiaAntes = new Date(dataLimite.getTime() - 24 * 60 * 60 * 1000);
-    // 1 hora antes
     const umaHoraAntes = new Date(dataLimite.getTime() - 60 * 60 * 1000);
 
     const dueDate = dataLimite.toISOString().slice(0, 10);
@@ -28,7 +26,7 @@ export class NotificacoesService {
 
     if (umDiaAntes > agora) {
       notifications.push({
-        id: tarefaId * 10 + 1, // ids diferentes para não chocarem
+        id: tarefaId * 10 + 1,
         title: titulo,
         body,
         schedule: { at: umDiaAntes, allowWhileIdle: true },

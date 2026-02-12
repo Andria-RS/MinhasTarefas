@@ -67,7 +67,7 @@ export class TasksService {
         image_url: task.image_url,
         completed: task.completed
       })
-      .select()  // ← IMPORTANTE: traz o registo inserido
+      .select() 
       .single();
 
     if (error) {

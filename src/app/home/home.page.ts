@@ -30,12 +30,11 @@ export class HomePage implements OnDestroy {
     private tasksService: TasksService,
     private projectsService: ProjectsService
   ) {
-    // escuta navegação APENAS se vier com queryParam _reload
     this.routerSub = this.router.events
       .pipe(filter(event => event instanceof NavigationEnd))
       .subscribe((event: any) => {
         if (event.url.includes('/tabs/home') && event.url.includes('_reload')) {
-          console.log('🔄 Home: detectou _reload na URL, a recarregar...');
+          console.log('Home: detectou _reload na URL, a recarregar...');
           this.carregarProjetos().then(() => this.carregarTarefas());
         }
       });
@@ -46,7 +45,7 @@ export class HomePage implements OnDestroy {
   }
 
   async ionViewWillEnter() {
-    console.log('🔄 Home: ionViewWillEnter');
+    console.log('Home: ionViewWillEnter');
     await this.carregarProjetos();
     await this.carregarTarefas();
   }
@@ -127,7 +126,7 @@ export class HomePage implements OnDestroy {
     const tasks: Task[] = await this.tasksService.getAllTasks();
 
     this.tarefas = tasks.map(t => this.mapTaskToTarefa(t, todayStr));
-    console.log('✅ Home: carregadas', this.tarefas.length, 'tarefas');
+    console.log('Home: carregadas', this.tarefas.length, 'tarefas');
   }
 
   async onModalDismiss(ev: any) {
@@ -143,7 +142,7 @@ export class HomePage implements OnDestroy {
   async onNovaTarefaFechar(task: Task | null) {
     this.isModalAberto = false;
 
-    console.log('📝 Home: modal fechou, task?', task ? task.id : 'null');
+    console.log('Home: modal fechou, task?', task ? task.id : 'null');
     if (task) {
       await this.carregarProjetos();
       await this.carregarTarefas();

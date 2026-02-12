@@ -30,7 +30,6 @@ export class ProjetosPage implements OnInit {
   projetos: Projeto[] = [];
   projetosOriginais: Projeto[] = [];
 
-  // modal Novo/Editar projeto
   isModalProjetoAberto = false;
   projetoEmEdicao: Projeto | null = null;
 
@@ -107,7 +106,6 @@ export class ProjetosPage implements OnInit {
     this.projetos = [...this.projetosOriginais];
   }
 
-  // SEARCHBAR
   filtrarProjetos(ev: any) {
     const texto: string = (ev.detail?.value || '').toLowerCase().trim();
 
@@ -130,19 +128,15 @@ export class ProjetosPage implements OnInit {
     this.opcoesService.abrirFiltros(
       'projetos',
       () => {
-        // ordem alfabética
         this.projetos = [...this.projetos].sort((a, b) =>
           a.nome.localeCompare(b.nome)
         );
       },
       () => {
-        // ordem original (como veio da BD)
         this.projetos = [...this.projetosOriginais];
       }
     );
   }
-
-  // ---------- NOVO / EDITAR PROJETO (sheet modal) ----------
 
   abrirNovoProjeto() {
     this.projetoEmEdicao = null;
@@ -169,7 +163,6 @@ export class ProjetosPage implements OnInit {
     const descricao = this.formProjeto.value.descricao.trim();
 
     if (this.projetoEmEdicao) {
-      // EDITAR
       const atualizado: Projeto = {
         ...this.projetoEmEdicao,
         nome,
@@ -179,7 +172,6 @@ export class ProjetosPage implements OnInit {
         this.mapProjetoToProject(atualizado)
       );
     } else {
-      // NOVO
       await this.projectsService.insertProject({
         name: nome,
         description: descricao,

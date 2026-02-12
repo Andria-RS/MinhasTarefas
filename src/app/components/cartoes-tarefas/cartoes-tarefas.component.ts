@@ -21,7 +21,7 @@ export class CartoesTarefasComponent {
   @Input() tarefa!: Tarefa;
 
   @Output() abrirDetalhes = new EventEmitter<Tarefa>();
-  @Output() abrirOpcoesProjetos = new EventEmitter<Tarefa>(); // se já tinhas para os 3 pontinhos
+  @Output() abrirOpcoesProjetos = new EventEmitter<Tarefa>(); 
 
   onClickCard() {
     this.abrirDetalhes.emit(this.tarefa);

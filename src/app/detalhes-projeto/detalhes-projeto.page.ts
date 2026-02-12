@@ -50,12 +50,11 @@ export class DetalhesProjetoPage implements OnInit, OnDestroy {
     private categoriesService: CategoriesService,
     private tasksService: TasksService
   ) {
-    // escuta mudanças na rota para recarregar quando voltar de detalhes-tarefas
     this.routerSub = this.router.events
       .pipe(filter(event => event instanceof NavigationEnd))
       .subscribe((event: any) => {
         if (event.url.includes('/detalhes-projeto/') && event.url.includes('_reload') && this.projectId) {
-          console.log('🔄 Detalhes-Projeto: detectou _reload, a recarregar...');
+          console.log('Detalhes-Projeto: detectou _reload, a recarregar...');
           this.carregarProjeto(this.projectId).then(() => 
             this.carregarTarefasDoProjeto(this.projeto.id, this.projeto.nome)
           );
@@ -86,7 +85,7 @@ export class DetalhesProjetoPage implements OnInit, OnDestroy {
   }
 
   async ionViewWillEnter() {
-    console.log('🔄 Detalhes-Projeto: ionViewWillEnter');
+    console.log(' Detalhes-Projeto: ionViewWillEnter');
     if (this.projectId) {
       await this.carregarProjeto(this.projectId);
       await this.carregarTarefasDoProjeto(this.projeto.id, this.projeto.nome);
@@ -191,10 +190,10 @@ export class DetalhesProjetoPage implements OnInit, OnDestroy {
     const todayStr = `${yyyy}-${mm}-${dd}`;
 
     const tasks = await this.tasksService.getTasksByProject(projectId);
-    console.log('✅ Detalhes-Projeto: tarefas BD =', tasks.length);
+    console.log('Detalhes-Projeto: tarefas BD =', tasks.length);
 
     this.tarefas = tasks.map(t => this.mapTaskToTarefa(t, todayStr, projectName));
-    console.log('✅ Detalhes-Projeto: tarefas FRONT =', this.tarefas.length);
+    console.log('Detalhes-Projeto: tarefas FRONT =', this.tarefas.length);
   }
 
   abrirOpcoesProjeto() {
@@ -241,7 +240,7 @@ export class DetalhesProjetoPage implements OnInit, OnDestroy {
   async onNovaTarefaProjetoFechar(task: Task | null) {
     this.isModalAberto = false;
 
-    console.log('📝 Detalhes-Projeto: modal fechou, task?', task ? task.id : 'null');
+    console.log('Detalhes-Projeto: modal fechou, task?', task ? task.id : 'null');
     if (task && this.projeto) {
       await this.carregarTarefasDoProjeto(this.projeto.id, this.projeto.nome);
     }

@@ -108,7 +108,7 @@ export class ProjectsService {
         name: project.name,
         description: project.description,
         status: project.status,
-        category_id: project.category_id   // <-- mantido
+        category_id: project.category_id
       })
       .eq('id', project.id);
 

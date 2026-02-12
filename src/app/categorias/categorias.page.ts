@@ -23,7 +23,6 @@ export class CategoriasPage implements OnInit {
   categorias: Categoria[] = [];
   categoriasOriginais: Categoria[] = [];
 
-  // modal Nova/Editar categoria
   isModalCategoriaAberto = false;
   categoriaEmEdicao: Categoria | null = null;
 
@@ -63,7 +62,6 @@ export class CategoriasPage implements OnInit {
       id: cat.id,
       name: cat.nome,
       icon: cat.icon
-      // total_projects não é guardado na BD
     };
   }
 
@@ -73,7 +71,6 @@ export class CategoriasPage implements OnInit {
     this.categorias = [...this.categoriasOriginais];
   }
 
-  // SEARCHBAR
   filtrarCategorias(ev: any) {
     const texto: string = (ev.detail?.value || '').toLowerCase().trim();
 
@@ -96,7 +93,6 @@ export class CategoriasPage implements OnInit {
       'categoria',
       cat.nome,
       () => {
-        // EDITAR → abre o modal preenchido
         this.categoriaEmEdicao = { ...cat };
         this.isModalCategoriaAberto = true;
         this.formCategoria.setValue({
@@ -105,7 +101,6 @@ export class CategoriasPage implements OnInit {
         });
       },
       async () => {
-        // ELIMINAR
         await this.categoriesService.deleteCategory(cat.id);
         await this.carregarCategorias();
       }
@@ -125,8 +120,6 @@ export class CategoriasPage implements OnInit {
       }
     );
   }
-
-  // -------- NOVA / EDITAR CATEGORIA (sheet modal) --------
 
   abrirNovaCategoria() {
     this.categoriaEmEdicao = null;
@@ -153,7 +146,6 @@ export class CategoriasPage implements OnInit {
     const icon = this.formCategoria.value.icon.trim() || 'folder-open-outline';
 
     if (this.categoriaEmEdicao) {
-      // EDITAR
       const catAtualizada: Categoria = {
         ...this.categoriaEmEdicao,
         nome,
@@ -164,7 +156,6 @@ export class CategoriasPage implements OnInit {
         this.mapCategoriaToCategory(catAtualizada)
       );
     } else {
-      // NOVA
       const novaCategoria: Category = {
         name: nome,
         icon

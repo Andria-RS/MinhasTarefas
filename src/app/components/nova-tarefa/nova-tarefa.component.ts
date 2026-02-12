@@ -22,7 +22,7 @@ interface ProjetoOption {
   standalone: false
 })
 export class NovaTarefaComponent implements OnInit {
-  @Input() projeto?: number;   // id do projeto vindo de detalhes-projeto
+  @Input() projeto?: number;
   @Input() categoria?: any;
   @Output() fecharModal = new EventEmitter<Task | null>();
 
@@ -43,7 +43,6 @@ export class NovaTarefaComponent implements OnInit {
   ) {}
 
   async ngOnInit() {
-    // inicializar form
     this.form = this.fb.group({
       titulo: ['', Validators.required],
       categoriaSelecionadaId: [this.categoria ?? null, Validators.required],
@@ -52,17 +51,10 @@ export class NovaTarefaComponent implements OnInit {
       descricao: ['', Validators.required],
     });
 
-    // carregar categorias
     this.categorias = await this.categoriesService.getAllCategories();
 
-    // se veio categoria inicial, carrega projetos dessa categoria
     if (!this.projeto && this.categoria) {
       await this.onCategoriaChange();
-    }
-
-    // se veio projeto fixo (detalhes-projeto), não precisamos de carregar lista aqui
-    if (this.projeto) {
-      // opcional: poderias buscar info desse projeto se quisesses mostrar nome
     }
   }
 
@@ -90,7 +82,7 @@ export class NovaTarefaComponent implements OnInit {
     const imagem = await this.imageService.pickFromGallery();
     if (imagem) {
       this.imagemUrl = imagem;
-      console.log('✅ Imagem selecionada!');
+      console.log('Imagem selecionada!');
     }
   }
 
@@ -106,7 +98,6 @@ export class NovaTarefaComponent implements OnInit {
 
     const values = this.form.value;
 
-    // se veio projeto pela @Input (detalhes-projeto), usamos esse
     const finalProjectId = this.projeto ?? values.projetoSelecionadoId;
 
     if (!finalProjectId) {

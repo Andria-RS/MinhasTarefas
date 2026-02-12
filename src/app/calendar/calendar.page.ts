@@ -13,6 +13,7 @@ import { ProjectsService } from '../services/projects.service';
   styleUrls: ['./calendar.page.scss'],
   standalone: false
 })
+
 export class CalendarPage implements OnInit, OnDestroy {
   todasTarefas: Task[] = [];
   tarefasDoDia: Tarefa[] = [];
@@ -28,12 +29,11 @@ export class CalendarPage implements OnInit, OnDestroy {
     private router: Router,
     private route: ActivatedRoute
   ) {
-    // ✅ NOVO: Escuta navegação com _reload (igual à home)
     this.routerSub = this.router.events
       .pipe(filter(event => event instanceof NavigationEnd))
       .subscribe((event: any) => {
         if (event.url.includes('/tabs/calendar') && event.url.includes('_reload')) {
-          console.log('🔄 Calendar: detectou _reload na URL, a recarregar...');
+          console.log('Calendar: detectou _reload na URL, a recarregar...');
           this.carregarProjetos().then(() => this.carregarTarefas()).then(() => this.filtrarTarefasDoDia());
         }
       });
@@ -44,7 +44,7 @@ export class CalendarPage implements OnInit, OnDestroy {
   }
 
   async ngOnInit() {
-    console.log('📅 CalendarPage: Iniciando...');
+    console.log('CalendarPage: Iniciando...');
     
     await this.carregarProjetos();
     await this.carregarTarefas();
@@ -56,13 +56,12 @@ export class CalendarPage implements OnInit, OnDestroy {
     this.filtrarTarefasDoDia();
     this.forcarCapitalizacao();
     
-    console.log('📅 Data selecionada:', this.dataSelecionada);
-    console.log('📅 Tarefas de hoje:', this.tarefasDoDia.length);
+    console.log('Data selecionada:', this.dataSelecionada);
+    console.log('Tarefas de hoje:', this.tarefasDoDia.length);
   }
 
-  // ✅ NOVO: Recarrega sempre que voltar à página (igual à home)
   async ionViewWillEnter() {
-    console.log('🔄 Calendar: ionViewWillEnter');
+    console.log('Calendar: ionViewWillEnter');
     await this.carregarProjetos();
     await this.carregarTarefas();
     this.filtrarTarefasDoDia();
@@ -71,7 +70,7 @@ export class CalendarPage implements OnInit, OnDestroy {
   async carregarProjetos() {
     try {
       this.projetos = await this.projectsService.getAllProjects();
-      console.log('📦 Projetos carregados:', this.projetos.length);
+      console.log('Projetos carregados:', this.projetos.length);
     } catch (error) {
       console.error('Erro ao carregar projetos:', error);
       this.projetos = [];
@@ -81,7 +80,7 @@ export class CalendarPage implements OnInit, OnDestroy {
   async carregarTarefas() {
     try {
       this.todasTarefas = await this.tasksService.getAllTasks();
-      console.log('✅ Tarefas carregadas:', this.todasTarefas.length);
+      console.log('Tarefas carregadas:', this.todasTarefas.length);
       
       this.prepararHighlightedDates();
     } catch (error) {
@@ -97,7 +96,7 @@ export class CalendarPage implements OnInit, OnDestroy {
         .map(t => t.due_date!)
     );
     
-    console.log('📌 Dias com tarefas:', Array.from(datasComTarefas));
+    console.log('Dias com tarefas:', Array.from(datasComTarefas));
     
     this.highlightedDates = (dateString: string) => {
       const dateOnly = dateString.split('T')[0];
@@ -107,7 +106,7 @@ export class CalendarPage implements OnInit, OnDestroy {
 
   onDateChange(event: any) {
     const novaData = event.detail.value;
-    console.log('📅 Data mudou:', novaData);
+    console.log('Data mudou:', novaData);
     
     if (!novaData) {
       this.tarefasDoDia = [];
@@ -121,13 +120,13 @@ export class CalendarPage implements OnInit, OnDestroy {
   filtrarTarefasDoDia() {
     const dataISO = this.dataSelecionada.split('T')[0];
     
-    console.log('🔍 Filtrando tarefas para:', dataISO);
+    console.log('Filtrando tarefas para:', dataISO);
     
     const tasksDoDia = this.todasTarefas.filter(
       tarefa => tarefa.due_date === dataISO
     );
     
-    console.log('✅ Tarefas encontradas:', tasksDoDia.length);
+    console.log('Tarefas encontradas:', tasksDoDia.length);
     
     this.tarefasDoDia = tasksDoDia.map(task => this.convertTaskToTarefa(task));
   }
@@ -164,13 +163,11 @@ export class CalendarPage implements OnInit, OnDestroy {
     
     if (!task.due_date) return 'por-fazer';
     
-    // Criar datetime completo da tarefa
     const dueDatetime = new Date(`${task.due_date}T${task.due_time || '23:59:59'}`);
     const agora = new Date();
     
-    // Se a data+hora já passou, está atrasada
     if (dueDatetime < agora) {
-      console.log('⏰ Tarefa atrasada:', task.title);
+      console.log('Tarefa atrasada:', task.title);
       return 'atrasada';
     }
     
@@ -184,7 +181,6 @@ export class CalendarPage implements OnInit, OnDestroy {
     
     const hoje = new Date().toISOString().split('T')[0];
     
-    // Se é hoje, verifica a hora para ver se já passou
     if (task.due_date === hoje) {
       const dueDatetime = new Date(`${task.due_date}T${task.due_time || '23:59:59'}`);
       const agora = new Date();
@@ -195,7 +191,6 @@ export class CalendarPage implements OnInit, OnDestroy {
       return 'hoje';
     }
     
-    // Se a data já passou
     if (task.due_date < hoje) {
       return 'atrasadas';
     }
@@ -237,7 +232,6 @@ export class CalendarPage implements OnInit, OnDestroy {
   }
 
   abrirDetalhesTarefa(tarefa: Tarefa) {
-    // Navega para detalhes com queryParam from=calendar
     this.router.navigate(['/detalhes-tarefas', tarefa.id], {
       queryParams: { from: 'calendar' }
     });

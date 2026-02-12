@@ -181,7 +181,6 @@ export class DetalhesTarefasPage implements OnInit {
     }
     this.tarefa = await this.mapTaskToDetalhe(task);
 
-    // inicializar/atualizar reactive form
     this.formEditar = this.fb.group({
       titulo: [this.tarefa.titulo, Validators.required],
       dataLimite: [this.tarefa.dataLimite || null, Validators.required],
@@ -314,7 +313,7 @@ export class DetalhesTarefasPage implements OnInit {
       imagemUrl: v.imagemUrl || this.tarefaEditavel.imagemUrl,
       dataData: '',
       dataHora: '',
-      categoria: this.tarefa.categoria, // será recalculado se precisares
+      categoria: this.tarefa.categoria,
       projetoNome: this.tarefa.projetoNome
     };
 
