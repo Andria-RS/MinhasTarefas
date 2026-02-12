@@ -13,11 +13,6 @@ const routes: Routes = [
       import('./tabs/tabs.module').then(m => m.TabsPageModule)
   },
   {
-    path: 'tarefas/:id',
-    loadChildren: () =>
-      import('./tarefas/tarefas.module').then(m => m.TarefasPageModule)
-  },
-  {
     path: 'projetos',
     loadChildren: () =>
       import('./projetos/projetos.module').then(m => m.ProjetosPageModule)
