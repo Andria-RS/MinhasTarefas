@@ -11,8 +11,13 @@ import { NotificacoesService } from '../services/notificacoes.service';
 import { getSupabase } from '../services/supabase.client';
 import { construirMensagemNotificacao } from '../services/notificacoes-text.helper';
 
+/** Tipo que define os estados possíveis de uma tarefa. */
 type EstadoTarefa = 'por-fazer' | 'feito' | 'atrasada';
 
+/**
+ * Interface local que representa os detalhes completos de uma tarefa.
+ * Inclui informações do projeto e categoria associados, além de formatação de datas.
+ */
 interface DetalheTarefa {
   id: number;
   titulo: string;
@@ -34,21 +39,45 @@ interface DetalheTarefa {
   styleUrls: ['./detalhes-tarefas.page.scss'],
   standalone: false
 })
+
+/**
+ * Componente da página de detalhes de uma tarefa.
+ * Permite visualizar, editar e eliminar uma tarefa específica.
+ * Gere notificações locais e sincronização com a base de dados.
+ * Trata navegação de volta para a origem (home, project, calendar).
+ */
 export class DetalhesTarefasPage implements OnInit {
+  /** ID da tarefa a ser exibida (obtido da rota). */
   tarefaId!: number;
+  
+  /** Objeto com os detalhes completos da tarefa. */
   tarefa!: DetalheTarefa;
-
+  
+  /** Indica se o modal de editar tarefa está aberto. */
   isModalEditarAberto = false;
+  
+  /** Cópia da tarefa em modo de edição. */
   tarefaEditavel!: DetalheTarefa;
-
+  
+  /** Lista de todas as categorias disponíveis. */
   categorias: Category[] = [];
+  
+  /** Lista de projetos da categoria selecionada (para dropdown de edição). */
   projetos: { id: number; nome: string }[] = [];
-
+  
+  /** Formulário reativo para editar a tarefa. */
   formEditar!: FormGroup;
-
+  
+  /** Origem da navegação (home, project, calendar) para retorno correto. */
   private origemNavegacao: string = '';
+  
+  /** ID do projeto de origem, se navegação veio da página de projeto. */
   private origemProjectId?: number;
 
+  /**
+   * Construtor da página de detalhes de tarefa.
+   * Injeta todas as dependências necessárias para gestão da tarefa.
+   */
   constructor(
     private route: ActivatedRoute,
     private router: Router,
@@ -60,6 +89,11 @@ export class DetalhesTarefasPage implements OnInit {
     private fb: FormBuilder
   ) {}
 
+  /**
+   * Método do ciclo de vida Angular chamado na inicialização do componente.
+   * Obtém o ID da tarefa da rota, valida, carrega categorias e a tarefa.
+   * Também obtém informações sobre a origem da navegação para retorno correto.
+   */
   async ngOnInit() {
     const idParam = this.route.snapshot.paramMap.get('tarefaId');
     this.tarefaId = idParam ? +idParam : 0;
@@ -77,6 +111,12 @@ export class DetalhesTarefasPage implements OnInit {
     await this.carregarTarefa();
   }
 
+  /**
+   * Converte um objeto Task (do serviço) para DetalheTarefa (interface local).
+   * Carrega informações completas do projeto e categoria associados.
+   * Formata datas e horas para exibição em português.
+   * Carrega também os projetos da mesma categoria para o dropdown de edição.
+   */
   private async mapTaskToDetalhe(task: Task): Promise<DetalheTarefa> {
     let isoDataLimite = '';
     let dataFormatada = '';
@@ -86,7 +126,6 @@ export class DetalhesTarefasPage implements OnInit {
       const base = task.due_date;
       const time = task.due_time || '00:00:00';
       isoDataLimite = `${base}T${time}`;
-
       const d = new Date(isoDataLimite);
       dataFormatada = d.toLocaleDateString('pt-PT');
       horaFormatada = d.toLocaleTimeString('pt-PT', {
@@ -107,10 +146,9 @@ export class DetalhesTarefasPage implements OnInit {
       if (project) {
         projetoNome = project.name;
         projetoId = project.id ?? task.project_id;
-
+        
         if (project.category_id) {
           categoriaId = project.category_id;
-
           const categoria: Category | null =
             await this.categoriesService.getCategoryById(project.category_id);
           if (categoria) {
@@ -143,6 +181,10 @@ export class DetalhesTarefasPage implements OnInit {
     };
   }
 
+  /**
+   * Converte um objeto DetalheTarefa (interface local) para Task (do serviço).
+   * Converte as datas formatadas de volta para formato ISO.
+   */
   private mapDetalheToTask(det: DetalheTarefa): Task {
     let due_date = '';
     let due_time: string | undefined = undefined;
@@ -173,12 +215,18 @@ export class DetalhesTarefasPage implements OnInit {
     };
   }
 
+  /**
+   * Carrega os dados completos da tarefa a partir do serviço.
+   * Se a tarefa não existir, redireciona para a home.
+   * Inicializa o formulário de edição com os dados da tarefa.
+   */
   async carregarTarefa() {
     const task = await this.tasksService.getTaskById(this.tarefaId);
     if (!task) {
       this.router.navigate(['/tabs/home'], { replaceUrl: true });
       return;
     }
+
     this.tarefa = await this.mapTaskToDetalhe(task);
 
     this.formEditar = this.fb.group({
@@ -192,6 +240,11 @@ export class DetalhesTarefasPage implements OnInit {
     });
   }
 
+  /**
+   * Retorna à página de origem da navegação.
+   * Pode ser home, página de projeto ou calendário.
+   * Adiciona parâmetro _reload para forçar atualização dos dados.
+   */
   voltarParaOrigem() {
     if (this.origemNavegacao === 'project' && this.origemProjectId) {
       this.router.navigate(['/detalhes-projeto', this.origemProjectId], {
@@ -208,6 +261,11 @@ export class DetalhesTarefasPage implements OnInit {
     }
   }
 
+  /**
+   * Abre o menu de opções (editar/eliminar) para a tarefa.
+   * Configura callbacks para edição e eliminação.
+   * Após eliminação, retorna à página de origem.
+   */
   abrirOpcoesTarefa() {
     this.opcoesService.abrirEditarEliminar(
       'tarefa',
@@ -215,7 +273,6 @@ export class DetalhesTarefasPage implements OnInit {
       () => this.abrirEditarTarefa(),
       async () => {
         await this.tasksService.deleteTask(this.tarefaId);
-
         if (this.origemNavegacao === 'project' && this.origemProjectId) {
           this.router.navigate(['/detalhes-projeto', this.origemProjectId], {
             queryParams: { _reload: Date.now() }
@@ -233,9 +290,12 @@ export class DetalhesTarefasPage implements OnInit {
     );
   }
 
+  /**
+   * Abre o modal de edição da tarefa.
+   * Preenche o formulário com os dados atuais da tarefa.
+   */
   abrirEditarTarefa() {
     this.tarefaEditavel = { ...this.tarefa };
-
     if (this.formEditar) {
       this.formEditar.setValue({
         titulo: this.tarefa.titulo,
@@ -247,14 +307,18 @@ export class DetalhesTarefasPage implements OnInit {
         imagemUrl: this.tarefa.imagemUrl
       });
     }
-
     this.isModalEditarAberto = true;
   }
 
+  /** Fecha o modal de edição da tarefa. */
   fecharEditarTarefa() {
     this.isModalEditarAberto = false;
   }
 
+  /**
+   * Callback chamado quando a categoria é alterada no formulário de edição.
+   * Carrega os projetos da nova categoria selecionada e limpa o projeto selecionado.
+   */
   async onCategoriaChangeEditar() {
     const categoriaId = this.formEditar.get('categoriaId')?.value;
     if (!categoriaId) {
@@ -268,10 +332,13 @@ export class DetalhesTarefasPage implements OnInit {
       id: p.id ?? 0,
       nome: p.name
     }));
-
     this.formEditar.get('projetoId')?.setValue(null);
   }
 
+  /**
+   * Callback chamado quando uma nova imagem é selecionada.
+   * Lê o ficheiro e converte para DataUrl para armazenamento.
+   */
   onImageSelectedEditar(event: any) {
     const file = event.target.files[0];
     if (file) {
@@ -287,6 +354,7 @@ export class DetalhesTarefasPage implements OnInit {
     }
   }
 
+  /** Remove a imagem da tarefa em edição. */
   removerImagemEditar() {
     this.formEditar.get('imagemUrl')?.setValue('');
     if (this.tarefaEditavel) {
@@ -294,6 +362,12 @@ export class DetalhesTarefasPage implements OnInit {
     }
   }
 
+  /**
+   * Guarda as alterações feitas à tarefa.
+   * Valida o formulário, atualiza a tarefa no serviço.
+   * Agenda/atualiza notificações locais.
+   * Sincroniza com a tabela de notificações do Supabase.
+   */
   async guardarEditarTarefa() {
     if (this.formEditar.invalid) {
       this.formEditar.markAllAsTouched();
@@ -301,7 +375,6 @@ export class DetalhesTarefasPage implements OnInit {
     }
 
     const v = this.formEditar.value;
-
     this.tarefaEditavel = {
       ...this.tarefaEditavel,
       titulo: v.titulo,
@@ -327,7 +400,6 @@ export class DetalhesTarefasPage implements OnInit {
     }
 
     const taskToUpdate = this.mapDetalheToTask(this.tarefaEditavel);
-
     await this.tasksService.updateTask(taskToUpdate);
 
     if (taskToUpdate.id && taskToUpdate.due_date) {
