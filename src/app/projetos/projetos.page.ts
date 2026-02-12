@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { OpcoesService } from '../services/opcoes';
 import { ProjectsService, Project } from '../services/projects.service';
 import { CategoriesService } from '../services/categories.service';
@@ -32,18 +33,24 @@ export class ProjetosPage implements OnInit {
   // modal Novo/Editar projeto
   isModalProjetoAberto = false;
   projetoEmEdicao: Projeto | null = null;
-  novoProjetoNome = '';
-  novoProjetoDescricao = '';
+
+  formProjeto!: FormGroup;
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private opcoesService: OpcoesService,
     private projectsService: ProjectsService,
-    private categoriesService: CategoriesService
+    private categoriesService: CategoriesService,
+    private fb: FormBuilder
   ) {}
 
   async ngOnInit() {
+    this.formProjeto = this.fb.group({
+      nome: ['', Validators.required],
+      descricao: ['', Validators.required]
+    });
+
     const param = this.route.snapshot.paramMap.get('categoriaId');
     this.categoriaId = param ? Number(param) : 0;
 
@@ -139,25 +146,27 @@ export class ProjetosPage implements OnInit {
 
   abrirNovoProjeto() {
     this.projetoEmEdicao = null;
-    this.novoProjetoNome = '';
-    this.novoProjetoDescricao = '';
+    this.formProjeto.reset({
+      nome: '',
+      descricao: ''
+    });
     this.isModalProjetoAberto = true;
   }
 
   fecharNovoProjeto() {
     this.isModalProjetoAberto = false;
     this.projetoEmEdicao = null;
-    this.novoProjetoNome = '';
-    this.novoProjetoDescricao = '';
+    this.formProjeto.reset();
   }
 
   async guardarProjeto() {
-    if (!this.novoProjetoNome.trim() || !this.categoriaId) {
+    if (this.formProjeto.invalid || !this.categoriaId) {
+      this.formProjeto.markAllAsTouched();
       return;
     }
 
-    const nome = this.novoProjetoNome.trim();
-    const descricao = this.novoProjetoDescricao.trim();
+    const nome = this.formProjeto.value.nome.trim();
+    const descricao = this.formProjeto.value.descricao.trim();
 
     if (this.projetoEmEdicao) {
       // EDITAR

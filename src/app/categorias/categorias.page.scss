@@ -8,3 +8,52 @@ ion-avatar ion-icon {
   font-size: 35px;
 }
 
+/* Modal categoria com caixinhas retangulares */
+
+.categoria-modal-content {
+  --background: #000;
+  background: #000;
+  color: #fff;
+
+  form {
+    max-width: 420px;
+    margin: 0 auto;
+    padding: 0 20px 12px;
+  }
+
+  ion-item {
+    --background: #111;
+    --color: #fff;
+    --border-radius: 12px;
+    --border-width: 1px;
+    --border-color: #333;
+    --inner-padding-start: 12px;
+    --inner-padding-end: 12px;
+    margin: 14px 0 4px;
+  }
+
+  ion-label[position="stacked"] {
+    font-weight: 700;
+    font-size: 0.95rem;
+    margin-bottom: 6px;
+  }
+
+  ion-input {
+    --color: #fff;
+    --padding-start: 0;
+    --padding-end: 0;
+  }
+
+  .btn-guardar-categoria {
+    margin: 24px 0 8px;
+    border-radius: 999px;
+    width: 100%;
+    font-weight: 600;
+  }
+
+  ion-text[color="danger"] {
+    display: block;
+    margin: 0 0 0 4px;
+    font-size: 0.75rem;
+  }
+}

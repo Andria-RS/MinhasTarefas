@@ -10,6 +10,7 @@
 </ion-header>
 
 <ion-content [fullscreen]="true">
+  <!-- Search -->
   <ion-item lines="none">
     <ion-searchbar
       placeholder="Filtrar projetos"
@@ -17,6 +18,7 @@
     </ion-searchbar>
   </ion-item>
 
+  <!-- Lista de projetos -->
   <ion-list>
     <ion-item
       *ngFor="let proj of projetos"
@@ -75,42 +77,54 @@
         </ion-toolbar>
       </ion-header>
 
-      <ion-content class="ion-padding projeto-modal-content">
+      <ion-content class="projeto-modal-content">
+        <form [formGroup]="formProjeto" (ngSubmit)="guardarProjeto()">
 
-        <!-- Título -->
-        <ion-item lines="full">
-          <ion-label position="stacked">Título</ion-label>
-          <ion-input
-            placeholder="Ex: Estudar PMEU"
-            [(ngModel)]="novoProjetoNome">
-          </ion-input>
-        </ion-item>
+          <!-- Título -->
+          <ion-item lines="none">
+            <ion-label position="stacked">Título</ion-label>
+            <ion-input
+              placeholder="Ex: Estudar X"
+              formControlName="nome">
+            </ion-input>
+          </ion-item>
+          <ion-text color="danger"
+                    *ngIf="formProjeto.get('nome')?.invalid && formProjeto.get('nome')?.touched">
+            <small>Título é obrigatório.</small>
+          </ion-text>
 
-        <!-- Descrição -->
-        <ion-item lines="full">
-          <ion-label position="stacked">Descrição</ion-label>
-          <ion-textarea
-            autoGrow="true"
-            placeholder="Escreve aqui os detalhes do projeto..."
-            [(ngModel)]="novoProjetoDescricao">
-          </ion-textarea>
-        </ion-item>
+          <!-- Descrição -->
+          <ion-item lines="none">
+            <ion-label position="stacked">Descrição</ion-label>
+            <ion-textarea
+              autoGrow="true"
+              placeholder="Escreve aqui os detalhes do projeto..."
+              formControlName="descricao">
+            </ion-textarea>
+          </ion-item>
+          <ion-text color="danger"
+                    *ngIf="formProjeto.get('descricao')?.invalid && formProjeto.get('descricao')?.touched">
+            <small>Descrição é obrigatória.</small>
+          </ion-text>
 
-        <!-- Categoria (só visual, preenchida automaticamente) -->
-        <ion-item lines="none" disabled="true">
-          <ion-label>
-            <h2>Categoria</h2>
-            <p>{{ titulo }}</p>
-          </ion-label>
-        </ion-item>
+          <!-- Categoria (só visual, preenchida automaticamente) -->
+          <ion-item lines="none" disabled="true">
+            <ion-label>
+              <h2>Categoria</h2>
+              <p>{{ titulo }}</p>
+            </ion-label>
+          </ion-item>
 
-        <ion-button
-          expand="block"
-          color="roxo"
-          (click)="guardarProjeto()"
-        >
-          {{ projetoEmEdicao ? 'Guardar alterações' : 'Criar projeto' }}
-        </ion-button>
+          <ion-button
+            expand="block"
+            color="roxo"
+            class="btn-guardar-projeto"
+            type="submit"
+            [disabled]="formProjeto.invalid">
+            {{ projetoEmEdicao ? 'Guardar alterações' : 'Criar projeto' }}
+          </ion-button>
+
+        </form>
       </ion-content>
     </ng-template>
   </ion-modal>

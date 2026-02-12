@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { OpcoesService } from '../services/opcoes';
 import { CategoriesService } from '../services/categories.service';
 import { Category } from '../services/category';
@@ -20,21 +21,27 @@ interface Categoria {
 export class CategoriasPage implements OnInit {
 
   categorias: Categoria[] = [];
-  categoriasOriginais: Categoria[] = []; // cópia para filtros/pesquisa
+  categoriasOriginais: Categoria[] = [];
 
   // modal Nova/Editar categoria
   isModalCategoriaAberto = false;
-  novaCategoriaNome = '';
-  novaCategoriaIcon = '';
   categoriaEmEdicao: Categoria | null = null;
+
+  formCategoria!: FormGroup;
 
   constructor(
     private router: Router,
     private opcoesService: OpcoesService,
-    private categoriesService: CategoriesService
+    private categoriesService: CategoriesService,
+    private fb: FormBuilder
   ) {}
 
   async ngOnInit() {
+    this.formCategoria = this.fb.group({
+      nome: ['', Validators.required],
+      icon: ['', Validators.required]
+    });
+
     await this.carregarCategorias();
   }
 
@@ -56,7 +63,7 @@ export class CategoriasPage implements OnInit {
       id: cat.id,
       name: cat.nome,
       icon: cat.icon
-      // total_projects não é guardado na BD, por isso não vai aqui
+      // total_projects não é guardado na BD
     };
   }
 
@@ -91,9 +98,11 @@ export class CategoriasPage implements OnInit {
       () => {
         // EDITAR → abre o modal preenchido
         this.categoriaEmEdicao = { ...cat };
-        this.novaCategoriaNome = cat.nome;
-        this.novaCategoriaIcon = cat.icon;
         this.isModalCategoriaAberto = true;
+        this.formCategoria.setValue({
+          nome: cat.nome,
+          icon: cat.icon
+        });
       },
       async () => {
         // ELIMINAR
@@ -107,13 +116,11 @@ export class CategoriasPage implements OnInit {
     this.opcoesService.abrirFiltros(
       'categorias',
       () => {
-        // ordem alfabética em cima do array atual
         this.categorias = [...this.categorias].sort((a, b) =>
           a.nome.localeCompare(b.nome)
         );
       },
       () => {
-        // repor lista original (como veio da BD)
         this.categorias = [...this.categoriasOriginais];
       }
     );
@@ -123,25 +130,27 @@ export class CategoriasPage implements OnInit {
 
   abrirNovaCategoria() {
     this.categoriaEmEdicao = null;
-    this.novaCategoriaNome = '';
-    this.novaCategoriaIcon = '';
+    this.formCategoria.reset({
+      nome: '',
+      icon: ''
+    });
     this.isModalCategoriaAberto = true;
   }
 
   fecharNovaCategoria() {
     this.isModalCategoriaAberto = false;
     this.categoriaEmEdicao = null;
-    this.novaCategoriaNome = '';
-    this.novaCategoriaIcon = '';
+    this.formCategoria.reset();
   }
 
   async guardarNovaCategoria() {
-    if (!this.novaCategoriaNome.trim()) {
+    if (this.formCategoria.invalid) {
+      this.formCategoria.markAllAsTouched();
       return;
     }
 
-    const nome = this.novaCategoriaNome.trim();
-    const icon = this.novaCategoriaIcon.trim() || 'folder-open-outline';
+    const nome = this.formCategoria.value.nome.trim();
+    const icon = this.formCategoria.value.icon.trim() || 'folder-open-outline';
 
     if (this.categoriaEmEdicao) {
       // EDITAR
