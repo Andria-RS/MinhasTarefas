@@ -1,4 +1,5 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { TasksService } from '../../services/tasks.service';
 import { Task } from '../../services/task';
 import { CategoriesService } from '../../services/categories.service';
@@ -21,21 +22,19 @@ interface ProjetoOption {
   standalone: false
 })
 export class NovaTarefaComponent implements OnInit {
-  @Input() projeto?: number;
+  @Input() projeto?: number;   // id do projeto vindo de detalhes-projeto
   @Input() categoria?: any;
   @Output() fecharModal = new EventEmitter<Task | null>();
 
-  titulo = '';
-  descricao = '';
-  dataLimite?: string;
+  form!: FormGroup;
+
   imagemUrl?: string;
 
   categorias: Category[] = [];
-  categoriaSelecionadaId?: number;
   projetos: ProjetoOption[] = [];
-  projetoSelecionadoId?: number;
 
   constructor(
+    private fb: FormBuilder,
     private tasksService: TasksService,
     private categoriesService: CategoriesService,
     private projectsService: ProjectsService,
@@ -44,29 +43,47 @@ export class NovaTarefaComponent implements OnInit {
   ) {}
 
   async ngOnInit() {
+    // inicializar form
+    this.form = this.fb.group({
+      titulo: ['', Validators.required],
+      categoriaSelecionadaId: [this.categoria ?? null, Validators.required],
+      projetoSelecionadoId: [this.projeto ?? null, Validators.required],
+      dataLimite: [null, Validators.required],
+      descricao: ['', Validators.required],
+    });
+
+    // carregar categorias
     this.categorias = await this.categoriesService.getAllCategories();
 
+    // se veio categoria inicial, carrega projetos dessa categoria
+    if (!this.projeto && this.categoria) {
+      await this.onCategoriaChange();
+    }
+
+    // se veio projeto fixo (detalhes-projeto), não precisamos de carregar lista aqui
     if (this.projeto) {
-      this.projetoSelecionadoId = this.projeto;
+      // opcional: poderias buscar info desse projeto se quisesses mostrar nome
     }
   }
 
   async onCategoriaChange() {
-    if (!this.categoriaSelecionadaId) {
+    const categoriaId = this.form.get('categoriaSelecionadaId')?.value;
+
+    if (!categoriaId) {
       this.projetos = [];
-      this.projetoSelecionadoId = undefined;
+      this.form.get('projetoSelecionadoId')?.setValue(null);
       return;
     }
 
     const data: Project[] =
-      await this.projectsService.getProjectsByCategory(this.categoriaSelecionadaId);
+      await this.projectsService.getProjectsByCategory(categoriaId);
 
     this.projetos = data.map(p => ({
       id: p.id ?? 0,
       nome: p.name
     }));
 
-    this.projetoSelecionadoId = undefined;
+    this.form.get('projetoSelecionadoId')?.setValue(null);
   }
 
   async escolherImagem() {
@@ -82,11 +99,15 @@ export class NovaTarefaComponent implements OnInit {
   }
 
   async criar() {
-    if (!this.titulo.trim()) {
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
       return;
     }
 
-    const finalProjectId = this.projeto ?? this.projetoSelecionadoId;
+    const values = this.form.value;
+
+    // se veio projeto pela @Input (detalhes-projeto), usamos esse
+    const finalProjectId = this.projeto ?? values.projetoSelecionadoId;
 
     if (!finalProjectId) {
       return;
@@ -95,8 +116,8 @@ export class NovaTarefaComponent implements OnInit {
     let dueDate: string;
     let dueTime: string | undefined;
 
-    if (this.dataLimite) {
-      const d = new Date(this.dataLimite);
+    if (values.dataLimite) {
+      const d = new Date(values.dataLimite);
       dueDate = d.toISOString().slice(0, 10);
       dueTime = d.toTimeString().slice(0, 8);
     } else {
@@ -107,8 +128,8 @@ export class NovaTarefaComponent implements OnInit {
 
     const novaTask: Task = {
       project_id: finalProjectId,
-      title: this.titulo.trim(),
-      description: this.descricao.trim() || undefined,
+      title: values.titulo.trim(),
+      description: (values.descricao ?? '').trim() || undefined,
       due_date: dueDate,
       due_time: dueTime,
       image_url: this.imagemUrl || undefined,
@@ -118,7 +139,6 @@ export class NovaTarefaComponent implements OnInit {
     const criada = await this.tasksService.insertTask(novaTask);
 
     if (criada && criada.id && criada.due_date) {
-      // ✅ Local Notifications (1 dia antes + 1 hora antes)
       const iso = criada.due_time
         ? `${criada.due_date}T${criada.due_time}`
         : `${criada.due_date}T09:00:00`;
@@ -129,7 +149,6 @@ export class NovaTarefaComponent implements OnInit {
         iso
       );
 
-      // ✅ Notificação na BD com mensagem estilo "hoje / amanhã / em X dias"
       const supabase = getSupabase();
       const mensagem = construirMensagemNotificacao(
         criada.title,

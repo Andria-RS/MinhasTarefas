@@ -11,125 +11,143 @@
 
 <ion-content fullscreen="true" class="nova-tarefa-content">
 
-  <!-- IMAGEM -->
-  <ion-item lines="none">
-    <ion-label position="stacked">Imagem da tarefa</ion-label>
-    <ion-button 
-      fill="outline" 
-      expand="block" 
-      color="roxo"
-      (click)="escolherImagem()">
-      <ion-icon name="image-outline" slot="start"></ion-icon>
-      <ion-label>{{ imagemUrl ? 'Mudar imagem' : 'Escolher imagem' }}</ion-label>
-    </ion-button>
-  </ion-item>
-  <!-- Preview -->
-  <ion-item lines="none" class="preview-wrapper" *ngIf="imagemUrl">
-    <div class="image-container">
-      <img [src]="imagemUrl" alt="Pré-visualização">
+  <form [formGroup]="form" (ngSubmit)="criar()">
+
+    <!-- IMAGEM -->
+    <ion-item lines="none">
+      <ion-label position="stacked">Imagem da tarefa</ion-label>
       <ion-button 
-        fill="clear" 
-        color="danger" 
-        class="remove-btn"
-        (click)="removerImagem()">
-        <ion-icon name="close-circle"></ion-icon>
-      </ion-button>
-    </div>
-  </ion-item>
-
-  <!-- Título -->
-  <ion-item lines="full">
-    <ion-label position="stacked">Título</ion-label>
-    <ion-input
-      placeholder="Ex: Estudar PMEU"
-      [(ngModel)]="titulo">
-    </ion-input>
-  </ion-item>
-
-  <!-- Se vier de detalhes-projeto, só mostramos projeto fixo -->
-  <ion-item lines="full" *ngIf="projeto">
-    <ion-label position="stacked">Projeto</ion-label>
-    <ion-select disabled="true">
-      <ion-select-option [value]="projeto">
-        {{ projeto }}
-      </ion-select-option>
-    </ion-select>
-  </ion-item>
-
-  <!-- Se estiver na home, mostramos categoria + projeto dessa categoria -->
-  <ng-container *ngIf="!projeto">
-
-    <!-- Categoria -->
-    <ion-item lines="full">
-      <ion-label position="stacked">Categoria</ion-label>
-      <ion-select
-        placeholder="Selecionar categoria"
-        [(ngModel)]="categoriaSelecionadaId"
-        (ionChange)="onCategoriaChange()">
-        <ion-select-option
-          *ngFor="let c of categorias"
-          [value]="c.id">
-          {{ c.name }}
-        </ion-select-option>
-      </ion-select>
-    </ion-item>
-
-    <!-- Projeto dentro da categoria -->
-    <ion-item lines="full">
-      <ion-label position="stacked">Projeto</ion-label>
-      <ion-select
-        placeholder="Selecionar projeto"
-        [(ngModel)]="projetoSelecionadoId"
-        [disabled]="!projetos.length">
-        <ion-select-option
-          *ngFor="let p of projetos"
-          [value]="p.id">
-          {{ p.nome }}
-        </ion-select-option>
-      </ion-select>
-    </ion-item>
-
-  </ng-container>
-
-  <!-- Data e Hora -->
-  <ion-item lines="full">
-    <ion-label position="stacked">Data</ion-label>
-    <ion-datetime-button datetime="dt-tarefa" color="roxo"></ion-datetime-button>
-  </ion-item>
-
-  <ion-modal [keepContentsMounted]="true">
-    <ng-template>
-      <ion-datetime
-        id="dt-tarefa"
-        presentation="date-time"
-        [(ngModel)]="dataLimite"
-        locale="pt-PT"
+        fill="outline" 
+        expand="block" 
         color="roxo"
-        [showDefaultButtons]="true"
-        doneText="OK"
-        cancelText="Cancelar">
-      </ion-datetime>
-    </ng-template>
-  </ion-modal>
+        (click)="escolherImagem()">
+        <ion-icon name="image-outline" slot="start"></ion-icon>
+        <ion-label>{{ imagemUrl ? 'Mudar imagem' : 'Escolher imagem' }}</ion-label>
+      </ion-button>
+    </ion-item>
 
+    <!-- Preview -->
+    <ion-item lines="none" class="preview-wrapper" *ngIf="imagemUrl">
+      <div class="image-container">
+        <img [src]="imagemUrl" alt="Pré-visualização">
+        <ion-button 
+          fill="clear" 
+          color="danger" 
+          class="remove-btn"
+          (click)="removerImagem()">
+          <ion-icon name="close-circle"></ion-icon>
+        </ion-button>
+      </div>
+    </ion-item>
 
+    <!-- Título -->
+    <ion-item lines="none">
+      <ion-label position="stacked">Título</ion-label>
+      <ion-input
+        placeholder="Ex: Estudar PMEU"
+        formControlName="titulo">
+      </ion-input>
+    </ion-item>
+    <ion-text color="danger" *ngIf="form.get('titulo')?.invalid && form.get('titulo')?.touched">
+      <small>Título é obrigatório.</small>
+    </ion-text>
 
-  <!-- Descrição -->
-  <ion-item lines="full">
-    <ion-label position="stacked">Descrição</ion-label>
-    <ion-textarea
-      auto-grow="true"
-      placeholder="Escreve aqui os detalhes da tarefa..."
-      [(ngModel)]="descricao">
-    </ion-textarea>
-  </ion-item>
+    <!-- Se vier de detalhes-projeto, só mostramos projeto fixo -->
+    <ion-item lines="none" *ngIf="projeto">
+      <ion-label position="stacked">Projeto</ion-label>
+      <ion-select disabled="true">
+        <ion-select-option [value]="projeto">
+          {{ projeto }}
+        </ion-select-option>
+      </ion-select>
+    </ion-item>
 
-  <ion-button
-    expand="block"
-    color="roxo"
-    class="btn-criar"
-    (click)="criar()">
-    Criar
-  </ion-button>
+    <!-- Se estiver na home, mostramos categoria + projeto dessa categoria -->
+    <ng-container *ngIf="!projeto">
+
+      <!-- Categoria -->
+      <ion-item lines="none">
+        <ion-label position="stacked">Categoria</ion-label>
+        <ion-select
+          placeholder="Selecionar categoria"
+          formControlName="categoriaSelecionadaId"
+          (ionChange)="onCategoriaChange()">
+          <ion-select-option
+            *ngFor="let c of categorias"
+            [value]="c.id">
+            {{ c.name }}
+          </ion-select-option>
+        </ion-select>
+      </ion-item>
+      <ion-text color="danger" *ngIf="form.get('categoriaSelecionadaId')?.invalid && form.get('categoriaSelecionadaId')?.touched">
+        <small>Categoria é obrigatória.</small>
+      </ion-text>
+
+      <!-- Projeto dentro da categoria -->
+      <ion-item lines="none">
+        <ion-label position="stacked">Projeto</ion-label>
+        <ion-select
+          placeholder="Selecionar projeto"
+          formControlName="projetoSelecionadoId"
+          [disabled]="!projetos.length">
+          <ion-select-option
+            *ngFor="let p of projetos"
+            [value]="p.id">
+            {{ p.nome }}
+          </ion-select-option>
+        </ion-select>
+      </ion-item>
+      <ion-text color="danger" *ngIf="form.get('projetoSelecionadoId')?.invalid && form.get('projetoSelecionadoId')?.touched">
+        <small>Projeto é obrigatório.</small>
+      </ion-text>
+
+    </ng-container>
+
+    <!-- Data e Hora -->
+    <ion-item lines="none">
+      <ion-label position="stacked">Data</ion-label>
+      <ion-datetime-button datetime="dt-tarefa" color="roxo"></ion-datetime-button>
+    </ion-item>
+    <ion-modal [keepContentsMounted]="true">
+      <ng-template>
+        <ion-datetime
+          id="dt-tarefa"
+          presentation="date-time"
+          formControlName="dataLimite"
+          locale="pt-PT"
+          color="roxo"
+          [showDefaultButtons]="true"
+          doneText="OK"
+          cancelText="Cancelar">
+        </ion-datetime>
+      </ng-template>
+    </ion-modal>
+    <ion-text color="danger" *ngIf="form.get('dataLimite')?.invalid && form.get('dataLimite')?.touched">
+      <small>Data é obrigatória.</small>
+    </ion-text>
+
+    <!-- Descrição -->
+    <ion-item lines="none">
+      <ion-label position="stacked">Descrição</ion-label>
+      <ion-textarea
+        auto-grow="true"
+        placeholder="Escreve aqui os detalhes da tarefa..."
+        formControlName="descricao">
+      </ion-textarea>
+    </ion-item>
+    <ion-text color="danger" *ngIf="form.get('descricao')?.invalid && form.get('descricao')?.touched">
+      <small>Descrição é obrigatória.</small>
+    </ion-text>
+
+    <ion-button
+      expand="block"
+      color="roxo"
+      class="btn-criar"
+      type="submit"
+      [disabled]="form.invalid">
+      Criar
+    </ion-button>
+
+  </form>
 
 </ion-content>
